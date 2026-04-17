@@ -52,7 +52,7 @@
         color: black;
         font-size: 24px;
         font-weight: 700;
-        margin-top: 32px;
+        margin-top: 30px;
     }
 
     .login_view {
