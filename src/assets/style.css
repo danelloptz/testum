@@ -2,3 +2,12 @@
     font-family: 'SF';
     src: url('fonts/SF-Pro.ttf');
 }
+
+* {
+    padding: 0;
+    box-sizing: border-box;
+}
+
+span, h1, h2, h3, h4, p, div, td, th {
+    font-family: 'SF';
+}

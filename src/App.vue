@@ -18,6 +18,7 @@
     align-items: start;
     overflow-y: scroll;
     scrollbar-width: none;
+    background: #f8fafc;
     @media (max-width: 650px) {
       padding: 7px 0px;
     }
