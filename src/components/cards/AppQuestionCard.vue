@@ -97,6 +97,7 @@ export default {
   background: #f8fafc;
   border-radius: 16px;
   box-shadow: 0px 4px 25px 0px #0000000D;
+  min-width: 900px;
 }
 
 /* HEADER */

@@ -13,35 +13,39 @@
             <h2>Инструкция</h2>
             <p>Lorem ipsum dolor sit amet consectetur adipiscing elit Ut et.Lorem ipsum dolor sit amet consectetur adipiscing elit Ut et.Lorem ipsum dolor sit amet consectetur adipiscing elit Ut et.Lorem ipsum dolor sit amet consectetur adipiscing elit Ut et.</p>
         </div>
-        <AppQuestionCard
-            v-model="answer"
-            :current="1"
-            :total="5"
-            text="Lorem ipsum dolor sit amet consectetur adipiscing elit Ut et massa mi. Aliquam in hendrerit urna. ∫ f(x) dx = F(b) — F(a), mattis ligula consectetur, ultrices. ∫ f(x) dx = F(b) — F(a)"
-            :image="'https://img.freepik.com/free-photo/beautiful-shot-natural-scenery-autumn_181624-25934.jpg?semt=ais_hybrid&w=740&q=80'"
-            :answers="[
-                'Ответ 1',
-                'Ответ 2',
-                'Ответ $x^2$',
-                'Ответ 4'
-            ]"
-        />
+        <div class="questions">
+            <AppQuestionCard
+                v-for="(q, index) in questions"
+                :key="q.id"
+                :current="index + 1"
+                :total="questions.length"
+                :text="q.text"
+                :image="q.image"
+                :answers="q.answers"
+                :modelValue="answers[q.id]"
+                @update:modelValue="val => handleAnswer(q.id, val)"
+            />
+        </div>
+        <AppButton class="confirm">Завершить и отправить</AppButton>
     </section>
 </template>    
 
 <script>
     import AppQuestionCard from '@/components/cards/AppQuestionCard.vue';
     import AppHeader from '@/components/headers/AppHeader.vue';
+    import AppButton from '@/components/buttons/AppButton.vue';
 
     import { useUserStore } from '@/stores/user'
 
     export default {
-        components: { AppQuestionCard, AppHeader },
+        components: { AppQuestionCard, AppHeader, AppButton },
         data() {
             return {
                 answer: null,
                 toogle_items: ['Тесты', 'Результаты', 'Выход'],
                 activeIndex: 0,
+                questions: [],
+                answers: {}
             }
         },
         computed: {
@@ -50,6 +54,31 @@
             },
             userData() {
                 return useUserStore().user
+            }
+        },
+        async created() {
+            if (!this.testId) return
+
+            // 🔥 заглушка
+            this.questions = [
+            {
+                id: 1,
+                text: 'Интеграл: $\\int f(x) dx$',
+                image: 'https://img.freepik.com/free-photo/beautiful-shot-natural-scenery-autumn_181624-25934.jpg?semt=ais_hybrid&w=740&q=80',
+                answers: ['1', '2', '$x^2$', '4']
+            },
+            {
+                id: 2,
+                text: '2 + 2 = ?',
+                image: null,
+                answers: ['3', '4', '5']
+            }
+            ]
+        },
+
+        methods: {
+            handleAnswer(questionId, value) {
+            this.answers[questionId] = value
             }
         }
     };
@@ -86,5 +115,20 @@
         font-size: 16px;
         font-weight: 400;
         line-height: 1.5;
+    }
+
+    .questions {
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+    }
+
+    .confirm {
+        width: 228px;
+        height: 52px;
+        margin-top: 20px;
+        font-size: 16px;
+        border-radius: 8px;
+        margin-bottom: 60px;
     }
 </style>
