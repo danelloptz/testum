@@ -18,19 +18,22 @@
     <!-- ANSWERS -->
     <div class="answers">
       <label
-        v-for="(answer, index) in answers"
-        :key="index"
-        class="answer"
-        :class="{ selected: selected === index }"
-      >
-        <input
-          type="radio"
-          :value="index"
-          v-model="selected"
-          @change="onSelect(index)"
-        />
-        <span v-html="renderLatex(answer)"></span>
-      </label>
+            v-for="(answer, index) in answers"
+            :key="index"
+            class="answer"
+            :class="[
+                { selected: isSelected(index) },
+                getAnswerClass(index)
+            ]"
+            >
+            <input
+                :type="is_multiple_choice ? 'checkbox' : 'radio'"
+                :checked="isSelected(index)"
+                @change="onSelect(index)"
+                :disabled="showResult"
+            />
+            <span v-html="renderLatex(answer)"></span>
+        </label>
     </div>
   </div>
 </template>
@@ -46,18 +49,40 @@ export default {
     text: String,
     image: String,
     answers: Array,
-    modelValue: Number
+    modelValue: [Number, Array],
+    is_multiple_choice: Boolean,
+
+    correctAnswer: String,
+    showResult: Boolean,
   },
 
   data() {
     return {
-      selected: this.modelValue ?? null
+      selected: this.is_multiple_choice
+      ? (this.modelValue ?? [])
+      : (this.modelValue ?? null)
     };
   },
 
   watch: {
     modelValue(val) {
       this.selected = val;
+    },
+    is_multiple_choice: {
+        immediate: true,
+        handler(val) {
+        if (val) {
+            // checkbox → всегда массив
+            if (!Array.isArray(this.selected)) {
+            this.selected = this.selected !== null ? [this.selected] : [];
+            }
+        } else {
+            // radio → одно значение
+            if (Array.isArray(this.selected)) {
+            this.selected = this.selected[0] ?? null;
+            }
+        }
+        }
     }
   },
 
@@ -82,8 +107,43 @@ export default {
       });
     },
 
+    getAnswerClass(index) {
+        if (!this.showResult) return '';
+
+        const correct = Number(this.correctAnswer);
+
+        // ✅ правильный ответ — зелёный
+        if (index === correct) return 'correct';
+
+        // ❌ пользователь выбрал неправильный — красный
+        if (index === this.selected && index !== correct) return 'wrong';
+
+        return '';
+    },
+
     onSelect(index) {
-      this.$emit("update:modelValue", index);
+        if (this.is_multiple_choice) {
+            let updated = Array.isArray(this.selected) ? [...this.selected] : [];
+
+            if (updated.includes(index)) {
+                updated = updated.filter(i => i !== index);
+            } else {
+                updated.push(index);
+            }
+
+            this.selected = updated;
+            this.$emit("update:modelValue", updated);
+        } else {
+            this.selected = index;
+            this.$emit("update:modelValue", index);
+        }
+    },
+
+    isSelected(index) {
+        if (this.is_multiple_choice) {
+            return Array.isArray(this.selected) && this.selected.includes(index);
+        }
+        return this.selected === index;
     }
   }
 };
@@ -145,4 +205,14 @@ export default {
 .answer.selected {
   background: #dbeafe;
 }
+
+.answer.correct {
+  background: #dcfce7; /* светло-зелёный */
+  border: 1px solid #22c55e;
+}
+
+.answer.wrong {
+  background: #fee2e2; /* светло-красный */
+  border: 1px solid #ef4444;
+}   
 </style>

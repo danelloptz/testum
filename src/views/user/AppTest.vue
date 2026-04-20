@@ -13,7 +13,11 @@
             <h2>Инструкция</h2>
             <p>Lorem ipsum dolor sit amet consectetur adipiscing elit Ut et.Lorem ipsum dolor sit amet consectetur adipiscing elit Ut et.Lorem ipsum dolor sit amet consectetur adipiscing elit Ut et.Lorem ipsum dolor sit amet consectetur adipiscing elit Ut et.</p>
         </div>
-        <div class="questions">
+        <div class="instruction red" v-if="stage == 'extra'">
+            <h2>ОШИБКА</h2>
+            <p>Вы допустили ошибку при прохждении сложных вопросов. Пройдите дополнительные вопросы.</p>
+        </div>
+        <div class="questions" v-if="stage !== 'result'">
             <AppQuestionCard
                 v-for="(q, index) in questions"
                 :key="q.id"
@@ -23,10 +27,21 @@
                 :image="q.image"
                 :answers="q.answers"
                 :modelValue="answers[q.id]"
+                :is_multiple_choice="q.is_multiple_choice"
                 @update:modelValue="val => handleAnswer(q.id, val)"
             />
         </div>
-        <AppButton class="confirm">Завершить и отправить</AppButton>
+        <div v-if="stage === 'result'" class="result">
+            <h2>Результат теста</h2>
+
+            <div class="result_card">
+                <p><b>Оценка:</b> {{ result.mark }}</p>
+                <p><b>Процент выполнения:</b> {{ result.success_rate }}</p>
+                <p><b>Начало:</b> {{ formatDate(result.date_start) }}</p>
+                <p><b>Конец:</b> {{ formatDate(result.date_end) }}</p>
+            </div>
+        </div>
+        <AppButton class="confirm"  @click="submitTest">Завершить и отправить</AppButton>
     </section>
 </template>    
 
@@ -36,16 +51,29 @@
     import AppButton from '@/components/buttons/AppButton.vue';
 
     import { useUserStore } from '@/stores/user'
+    import { 
+        getHardQu, 
+        getBaseQu, 
+        postHardQu, 
+        postBaseQu, 
+        getTestResult 
+    } from '@/services/tests'
 
     export default {
         components: { AppQuestionCard, AppHeader, AppButton },
         data() {
             return {
-                answer: null,
+                stage: 'normal', // normal | extra | result
+
+                questions: [],
+                extraQuestions: [],
+
+                answers: {},
+
                 toogle_items: ['Тесты', 'Результаты', 'Выход'],
                 activeIndex: 0,
-                questions: [],
-                answers: {}
+
+                result: null
             }
         },
         computed: {
@@ -59,26 +87,73 @@
         async created() {
             if (!this.testId) return
 
-            // 🔥 заглушка
-            this.questions = [
-            {
-                id: 1,
-                text: 'Интеграл: $\\int f(x) dx$',
-                image: 'https://img.freepik.com/free-photo/beautiful-shot-natural-scenery-autumn_181624-25934.jpg?semt=ais_hybrid&w=740&q=80',
-                answers: ['1', '2', '$x^2$', '4']
-            },
-            {
-                id: 2,
-                text: '2 + 2 = ?',
-                image: null,
-                answers: ['3', '4', '5']
-            }
-            ]
+            const token = localStorage.getItem('token')
+
+            const data = await getHardQu(this.testId, token)
+
+            this.questions = this.normalizeQuestions(data)
         },
 
         methods: {
+            normalizeQuestions(data) {
+                return data.map(q => ({
+                    id: q.id,
+                    text: q.text,
+                    image: q.image_url,
+                    answers: q.options.map(opt => opt.text),
+                    is_multiple_choice: q.is_multiple_choice
+                }))
+            },
+            formatDate(ts) {
+                return new Date(ts).toLocaleString()
+            },
             handleAnswer(questionId, value) {
-            this.answers[questionId] = value
+                this.answers[questionId] = value
+            },
+
+            async submitTest() {
+                const token = localStorage.getItem('token')
+
+                // преобразуем ответы
+                const task_answers = Object.entries(this.answers).map(([qId, value]) => ({
+                    question_id: Number(qId),
+                    answer_id: value
+                }));
+
+                console.log(task_answers);
+
+                if (this.stage === 'normal') {
+                    const res = await postHardQu(this.testId, task_answers, token)
+
+                    if (res.all_correct) {
+                        await this.finishTest()
+                        return
+                    }
+
+                    // 👉 есть ошибки → грузим base
+                    const base = await getBaseQu(this.testId, token)
+
+                    this.stage = 'extra'
+                    this.questions = this.normalizeQuestions(base)
+                    this.answers = {}
+
+                    return
+                }
+
+                if (this.stage === 'extra') {
+                    await postBaseQu(this.testId, task_answers, token)
+
+                    await this.finishTest()
+                }
+            },
+
+            async finishTest() {
+                const token = localStorage.getItem('token')
+
+                const result = await getTestResult(this.testId, token)
+
+                this.result = result
+                this.stage = 'result'
             }
         }
     };
@@ -130,5 +205,10 @@
         font-size: 16px;
         border-radius: 8px;
         margin-bottom: 60px;
+    }
+
+    .red {
+        background: #fee2e2; /* светло-красный */
+        border: 1px solid #ef4444;
     }
 </style>
