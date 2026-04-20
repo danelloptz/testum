@@ -269,8 +269,8 @@ export async function getTestResult(test_id, token) {
         // return response.data;
         console.log(token);
         return {
-            mark: '5',
-            success_rate: '100%',
+            mark: '2',
+            success_rate: '20%',
             date_start: 1776270684000,
             date_end: 1777393884000,
         };
