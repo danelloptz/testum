@@ -23,7 +23,8 @@
                 :class="{
                     btn_in: test.status == 'В процессе',
                     btn_close: test.status == 'Не доступен',
-            }"
+                }"
+                @click="$emit('open')"
             >
                 {{ test.status == 'Доступен' ? 'Начать' : test.status == 'В процессе' ? 'Продолжить' : 'Результаты' }}
             </AppButton>

@@ -17,7 +17,7 @@
                 type="password"
                 class="input m20"
             />
-            <AppButton class="send">Войти</AppButton>
+            <AppButton class="send" @click="openHome">Войти</AppButton>
         </div>
     </section>
 </template>    
@@ -26,12 +26,24 @@
     import AppInputLabel from '@/components/inputs/AppInputLabel.vue';
     import AppButton from '@/components/buttons/AppButton.vue';
 
+    import { signIn } from '@/services/auth';
+
     export default {
         components: { AppInputLabel, AppButton },
         data() {
             return {
                 login: null, 
                 password: null
+            }
+        },
+        methods: {
+            async openHome() {
+                const resp = await signIn();
+                if (resp) {
+                    const token = resp.token;
+                    localStorage.setItem('token', token);
+                }
+                this.$router.push('/home');
             }
         }
     };

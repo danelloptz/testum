@@ -19,7 +19,8 @@ export async function getStudentTests(token) {
                 main_q: 15,
                 more_q: 5,
                 date_start: 1776270684000,
-                date_end: 1777393884000
+                date_end: 1777393884000,
+                id: 'fefe343kjn'
             },
             {
                 status: 'В процессе',
@@ -27,7 +28,8 @@ export async function getStudentTests(token) {
                 main_q: 15,
                 more_q: 5,
                 date_start: 1776270684000,
-                date_end: 1777393884000
+                date_end: 1777393884000,
+                id: 'rn3j2r23'
             },
             {
                 status: 'В процессе',
@@ -35,7 +37,8 @@ export async function getStudentTests(token) {
                 main_q: 15,
                 more_q: 5,
                 date_start: 1776270684000,
-                date_end: 1777393884000
+                date_end: 1777393884000,
+                id: 'enjfner304mf'
             },
             {
                 status: 'Не доступен',
@@ -43,7 +46,8 @@ export async function getStudentTests(token) {
                 main_q: 15,
                 more_q: 5,
                 date_start: 1776270684000,
-                date_end: 1777393884000
+                date_end: 1777393884000,
+                id: 'n34b3jhk35k'
             },
             {
                 status: 'Не доступен',
@@ -51,7 +55,8 @@ export async function getStudentTests(token) {
                 main_q: 15,
                 more_q: 5,
                 date_start: 1776270684000,
-                date_end: 1777393884000
+                date_end: 1777393884000,
+                id: 'n35n4kj54352l'
             },
         ];
     } catch (error) {
