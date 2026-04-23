@@ -133,8 +133,14 @@ router.beforeEach((to) => {
     }
 
     // 2. если уже залогинен и идёт на login
-    if (to.name === 'signin') {
-        return { name: 'home' }
+    if (to.name === 'signin' && user?.role) {
+        if (user.role === 'lector') {
+            return { name: 'lector' }
+        }
+
+        if (user.role === 'student') {
+            return { name: 'home' }
+        }
     }
 
     // 3. проверка ролей
