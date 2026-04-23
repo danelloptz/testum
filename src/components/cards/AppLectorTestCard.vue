@@ -1,13 +1,5 @@
 <template>
     <section class="card">
-        <span 
-            class="status"
-            :class="{
-                green: test.status == 'Доступен',
-                yellow: test.status == 'В процессе',
-                red: test.status == 'Не доступен',
-            }">{{ test.status }}</span>
-
             <h3>{{ test.name }}</h3>
             
             <span class="sm_mute">
@@ -26,7 +18,7 @@
                 }"
                 @click="$emit('open')"
             >
-                {{ test.status == 'Доступен' ? 'Начать' : test.status == 'В процессе' ? 'Продолжить' : 'Результаты' }}
+                {{ 'Просмотр' }}
             </AppButton>
     </section>
 </template>
@@ -116,6 +108,15 @@
         height: 52px;
         margin-top: 32px;
         font-size: 16px;
+        background: none;
+        border: 1px solid #1E293B;
+        color: #1E293B;
+        border-radius: 8px;
+    }
+
+    .card_btn:hover {
+        background: #1E293B;
+        color: white;
     }
 
     .btn_in {

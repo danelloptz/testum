@@ -11,7 +11,7 @@
         :key="index"
         class="header_toogle_items"
         :class="{ active: index === activeIndex }"
-        @click="$emit('change', index)"
+        @click="handler(index)"
       >
         {{ item }}
       </span>
@@ -27,6 +27,15 @@ export default {
     items: Array,
     activeIndex: Number,
     userName: String
+  },
+  methods: {
+    handler(index) {
+        if (index == 0) 
+            this.$router.push('/home');
+        if (index == 1) 
+            this.$router.push('/results');
+        this.$emit('change', index);
+    }
   }
 }
 </script>

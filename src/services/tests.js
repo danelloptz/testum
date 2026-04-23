@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-export async function getStudentTests(token) {
+export async function getStudentTests(offset, limit, token) {
     try {
-        // const response = await axios.get(`${API_BASE_URL}/api/v1/auth/me`, 
+        // const response = await axios.get(`${API_BASE_URL}/student/tests`, 
         //     {
         //         headers: {
         //             'Authorization': `Bearer ${token}`,
@@ -15,52 +15,92 @@ export async function getStudentTests(token) {
         return [
             {
                 status: 'Доступен',
+                id: 835353,
                 name: 'Интегральное исчисление: Базовый уровень',
-                main_q: 15,
-                more_q: 5,
+                cnt_questions: 15,
+                main_questions: 5,
+                creator: 'bogoyavl',
                 date_start: 1776270684000,
                 date_end: 1777393884000,
-                id: 'fefe343kjn'
+                date_created: 1776270684000
             },
             {
                 status: 'В процессе',
+                id: 57474,
                 name: 'Интегральное исчисление: Базовый уровень',
-                main_q: 15,
-                more_q: 5,
+                cnt_questions: 15,
+                main_questions: 5,
+                creator: 'bogoyavl',
                 date_start: 1776270684000,
                 date_end: 1777393884000,
-                id: 'rn3j2r23'
+                date_created: 1776270684000
             },
             {
                 status: 'В процессе',
+                id: 8585,
                 name: 'Интегральное исчисление: Базовый уровень',
-                main_q: 15,
-                more_q: 5,
+                cnt_questions: 15,
+                main_questions: 5,
+                creator: 'bogoyavl',
                 date_start: 1776270684000,
                 date_end: 1777393884000,
-                id: 'enjfner304mf'
+                date_created: 1776270684000
             },
             {
                 status: 'Не доступен',
+                id: 53563,
                 name: 'Интегральное исчисление: Базовый уровень',
-                main_q: 15,
-                more_q: 5,
+                cnt_questions: 15,
+                main_questions: 5,
+                creator: 'bogoyavl',
                 date_start: 1776270684000,
                 date_end: 1777393884000,
-                id: 'n34b3jhk35k'
+                date_created: 1776270684000
             },
             {
                 status: 'Не доступен',
+                id: 35353,
                 name: 'Интегральное исчисление: Базовый уровень',
-                main_q: 15,
-                more_q: 5,
+                cnt_questions: 15,
+                main_questions: 5,
+                creator: 'bogoyavl',
                 date_start: 1776270684000,
                 date_end: 1777393884000,
-                id: 'n35n4kj54352l'
+                date_created: 1776270684000
             },
         ];
     } catch (error) {
         console.error("Ошибка при получении информации о пользователе.", error);
+        return false; 
+    }
+}
+
+export async function getTestInfo(test_id, token) {
+    try {
+        // const response = await axios.get(`${API_BASE_URL}/student/test/${test_id}`, 
+        //     {
+        //         headers: {
+        //             'Authorization': `Bearer ${token}`,
+        //             'Content-Type': 'application/json'
+        //         }
+        //     }
+        // );
+        // return response.data;
+        console.log(token);
+        return {
+                status: 'Доступен',
+                id: 835353,
+                name: 'Интегральное исчисление: Базовый уровень',
+                cnt_questions: 15,
+                main_questions: 5,
+                creator: 'bogoyavl',
+                date_start: 1776270684000,
+                date_end: 1777393884000,
+                date_created: 1776270684000
+            };
+            
+    } catch (error) {
+        console.error("Ошибка при получении информации о конкретном тесте.", error);
         return false; 
     }
 }
@@ -276,6 +316,152 @@ export async function getTestResult(test_id, token) {
         };
     } catch (error) {
         console.error("Ошибка при получении результата теста", error);
+        return false; 
+    }
+}
+
+export async function getStudentFinishedTests(offset, limit, token) {
+    try {
+        // const response = await axios.get(`${API_BASE_URL}/student/tests`, 
+        //     {
+        //         headers: {
+        //             'Authorization': `Bearer ${token}`,
+        //             'Content-Type': 'application/json'
+        //         }
+        //     }
+        // );
+        // return response.data;
+        console.log(token);
+        return [
+            {
+                id: 835353,
+                name: 'Интегральное исчисление: Базовый уровень',
+                cnt_questions: 15,
+                main_questions: 5,
+                creator: 'bogoyavl',
+                date_start: 1776270684000,
+                date_end: 1777393884000,
+                date_created: 1776270684000
+            },
+            {
+                id: 57474,
+                name: 'Интегральное исчисление: Базовый уровень',
+                cnt_questions: 15,
+                main_questions: 5,
+                creator: 'bogoyavl',
+                date_start: 1776270684000,
+                date_end: 1777393884000,
+                date_created: 1776270684000
+            },
+            {
+                id: 8585,
+                name: 'Интегральное исчисление: Базовый уровень',
+                cnt_questions: 15,
+                main_questions: 5,
+                creator: 'bogoyavl',
+                date_start: 1776270684000,
+                date_end: 1777393884000,
+                date_created: 1776270684000
+            },
+            {
+                id: 53563,
+                name: 'Интегральное исчисление: Базовый уровень',
+                cnt_questions: 15,
+                main_questions: 5,
+                creator: 'bogoyavl',
+                date_start: 1776270684000,
+                date_end: 1777393884000,
+                date_created: 1776270684000
+            },
+            {
+                id: 35353,
+                name: 'Интегральное исчисление: Базовый уровень',
+                cnt_questions: 15,
+                main_questions: 5,
+                creator: 'bogoyavl',
+                date_start: 1776270684000,
+                date_end: 1777393884000,
+                date_created: 1776270684000
+            },
+        ];
+    } catch (error) {
+        console.error("Ошибка при получении информации о пользователе.", error);
+        return false; 
+    }
+}
+
+
+export async function getGroupTests(offset, limit, group_name, token) {
+    try {
+        // const response = await axios.get(`${API_BASE_URL}/student/tests`, 
+        //     {
+        //         headers: {
+        //             'Authorization': `Bearer ${token}`,
+        //             'Content-Type': 'application/json'
+        //         }
+        //     }
+        // );
+        // return response.data;
+        console.log(token);
+        return [
+            {
+                status: 'Доступен',
+                id: 835353,
+                name: 'Интегральное исчисление: Базовый уровень',
+                cnt_questions: 15,
+                main_questions: 5,
+                creator: 'bogoyavl',
+                date_start: 1776270684000,
+                date_end: 1777393884000,
+                date_created: 1776270684000
+            },
+            {
+                status: 'В процессе',
+                id: 57474,
+                name: 'Интегральное исчисление: Базовый уровень',
+                cnt_questions: 15,
+                main_questions: 5,
+                creator: 'bogoyavl',
+                date_start: 1776270684000,
+                date_end: 1777393884000,
+                date_created: 1776270684000
+            },
+            {
+                status: 'В процессе',
+                id: 8585,
+                name: 'Интегральное исчисление: Базовый уровень',
+                cnt_questions: 15,
+                main_questions: 5,
+                creator: 'bogoyavl',
+                date_start: 1776270684000,
+                date_end: 1777393884000,
+                date_created: 1776270684000
+            },
+            {
+                status: 'Не доступен',
+                id: 53563,
+                name: 'Интегральное исчисление: Базовый уровень',
+                cnt_questions: 15,
+                main_questions: 5,
+                creator: 'bogoyavl',
+                date_start: 1776270684000,
+                date_end: 1777393884000,
+                date_created: 1776270684000
+            },
+            {
+                status: 'Не доступен',
+                id: 35353,
+                name: 'Интегральное исчисление: Базовый уровень',
+                cnt_questions: 15,
+                main_questions: 5,
+                creator: 'bogoyavl',
+                date_start: 1776270684000,
+                date_end: 1777393884000,
+                date_created: 1776270684000
+            },
+        ];
+    } catch (error) {
+        console.error("Ошибка при получении информации о пользователе.", error);
         return false; 
     }
 }

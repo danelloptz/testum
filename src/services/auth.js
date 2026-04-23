@@ -1,14 +1,19 @@
 import axios from 'axios';
 
-export async function signIn() {
+export async function signIn(login, password) {
     try {
-        // const response = await axios.get(`https://kappa.cs.petrsu.ru:8080`);
+        // const response = await axios.post(`https://kappa.cs.petrsu.ru:8080/auth/login`, 
+        // {
+        //     login: str,
+        //     password: str
+        // });
         // return response.data;
         return {
-            token: 'fgvhbjklkkfg3h4jghucjvhmbefgrge'
+            access_token: 'gjrbgjrbeghergbjger',
+            refresh_token: 'fnejbghewrfbjk4ertk'
         }
     } catch (error) {
-        console.error("Ошибка при получении информации.", error);
+        console.error("Ошибка при авторизации.", error);
         return false; 
     }
 }

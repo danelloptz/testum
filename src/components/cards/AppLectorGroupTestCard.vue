@@ -18,16 +18,29 @@
                 {{ formatDate(test.date_start) }} — {{ formatDate(test.date_end) }}
             </span>
 
-            <AppButton 
-                class="card_btn"
-                :class="{
-                    btn_in: test.status == 'В процессе',
-                    btn_close: test.status == 'Не доступен',
-                }"
-                @click="$emit('open')"
-            >
-                {{ test.status == 'Доступен' ? 'Начать' : test.status == 'В процессе' ? 'Продолжить' : 'Результаты' }}
-            </AppButton>
+            <div class="btn_row">
+                <AppButton 
+                    class="card_btn"
+                    @click="$emit('open')"
+                >
+                    Результаты
+                </AppButton>
+                <div class="sm_row">
+                    <AppButton 
+                        class="sm_btn"
+                        @click="$emit('delete')"
+                    >
+                        <img src="@/assets/images/trash.png" class="card_btn_icon" />
+                    </AppButton>
+                    <AppButton 
+                        class="sm_btn"
+                        @click="$emit('download')"
+                    >
+                        <img src="@/assets/images/download.png" class="card_btn_icon" />
+                    </AppButton>
+                </div>
+            </div>
+            
     </section>
 </template>
 
@@ -114,8 +127,10 @@
     .card_btn {
         width: 141px;
         height: 52px;
-        margin-top: 32px;
         font-size: 16px;
+        background: none;
+        border: 1px solid #2563EB;
+        color: #2563EB;
     }
 
     .btn_in {
@@ -130,5 +145,32 @@
         border: 1px solid #1E293B;
         color: #1E293B;
         font-size: 16px;
+    }
+
+    .card_btn_icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .sm_btn {
+        width: 52px;
+        height: 52px;
+        background: none;
+        border: 1px solid #2563EB;
+        color: #2563EB;
+    }
+
+    .btn_row {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 32px;
+    }
+
+    .sm_row {
+        display: flex;
+        column-gap: 12px;
+        align-items: center;
     }
 </style>
