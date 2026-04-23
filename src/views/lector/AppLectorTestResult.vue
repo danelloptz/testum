@@ -9,44 +9,40 @@
 
         <main class="tests">
             <AppBreadcrumbs />
-            <h2>Ваши группы</h2>
-            <div 
-                class="cards"
-            >
-                <AppLectorGroupCard 
-                    v-for="(item, index) in groups"
-                    :key="index"
-                    :name="item.name"
-                    :count="item.count"
-                    @open="$router.push(`/lector/${item.name}`)"
-                />
-            </div>
+            <h2>Результаты теста: {{ testName }}</h2>
+            <AppLectorTestResultTable :results="students" />
+
         </main>
     </section>
 </template>    
 
 <script>
     import { useUserStore } from '@/stores/user'
-    import { getGroups } from '@/services/groups';
+    import { getStudentResults } from '@/services/tests';
 
-    import AppLectorGroupCard from '@/components/cards/AppLectorGroupCard.vue';
     import AppHeader from '@/components/headers/AppHeader.vue';
+    import AppLectorTestResultTable from '@/components/tables/AppLectorTestResultTable.vue';
     import AppBreadcrumbs from '@/components/navigation/AppBreadcrumbs.vue';
 
     export default {
-        components: { AppLectorGroupCard, AppHeader, AppBreadcrumbs },
+        components: { AppHeader, AppLectorTestResultTable, AppBreadcrumbs },
         data() {
             return {
                 userData: null,
                 token: 'mfkmrgk',
                 toogle_items: [
                     { label: 'Группы', route: '/lector' },
-                    { label: 'Инструменты', route: '/lector/tools' },
+                    { label: 'Инструменты', route: '/tools' },
                     { label: 'Выход', route: '/' }
                 ],
                 activeIndex: 0,
-                groups: null
+                students: null
             }
+        },
+        computed: {
+            testName() {
+                return this.$route.params.test_name
+            },
         },
         async created() {
             const userStore = useUserStore()
@@ -54,9 +50,10 @@
             await userStore.fetchUser()
             this.userData = userStore.user
 
-            const group_response = await getGroups(this.token)
+            const group_response = await getStudentResults(this.token)
             if (group_response) {
-                this.groups = group_response
+                this.students = group_response;
+                console.log(this.students);
             }
         },
         // methods: {
@@ -78,9 +75,9 @@
     }
 
     .tests {
-        margin-top: 64px;
+        margin-top: 20px;
         width: 100%;
-        padding-left: 150px;
+        padding: 0px 100px;
         display: flex;
         flex-direction: column;
         row-gap: 40px;

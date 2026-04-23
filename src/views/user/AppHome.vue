@@ -36,7 +36,11 @@
             return {
                 userData: null,
                 token: 'mfkmrgk',
-                toogle_items: ['Тесты', 'Результаты', 'Выход'],
+                toogle_items: [
+                    { label: 'Тесты', route: '/home' },
+                    { label: 'Результаты', route: '/results' },
+                    { label: 'Выход', route: '/' }
+                ],
                 activeIndex: 0,
                 tests: null
             }
@@ -56,6 +60,9 @@
             handleOpenCard(card) {
                 if (card.status == 'Доступен') {
                     this.$router.push(`/test/${card.id}`)
+                }
+                if (card.status == 'Не доступен') {
+                    this.$router.push(`/results/${card.id}/${card.name}`)
                 }
             }
         }

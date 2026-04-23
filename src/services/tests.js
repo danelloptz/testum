@@ -465,3 +465,59 @@ export async function getGroupTests(offset, limit, group_name, token) {
         return false; 
     }
 }
+
+export async function getStudentResults(test_id, group_name, token) {
+    try {
+        // const response = await axios.get(`${API_BASE_URL}/student/tests`, 
+        //     {
+        //         headers: {
+        //             'Authorization': `Bearer ${token}`,
+        //             'Content-Type': 'application/json'
+        //         }
+        //     }
+        // );
+        // return response.data;
+        console.log(token);
+        return [
+            {
+                id: 49860,
+                login: 'vasilenk',
+                name: 'Данил Василенко',
+                result: {
+                    mark: '5',
+                    success_rate: '4',
+                    percent: '100%',
+                    date_start: '1776270684000',
+                    date_end: '1776270684000'
+                }
+            },
+            {
+                id: 49860,
+                login: 'gzaharov',
+                name: 'Георгий Захаров',
+                result: {
+                    mark: '3',
+                    success_rate: '4',
+                    percent: '60%',
+                    date_start: '1776270684000',
+                    date_end: '1776270684000'
+                }
+            },
+            {
+                id: 49860,
+                login: 'semykin',
+                name: 'Антон Семыкин',
+                result: {
+                    mark: '4',
+                    success_rate: '4',
+                    percent: '80%',
+                    date_start: '1776270684000',
+                    date_end: '1776270684000'
+                }
+            }
+        ];
+    } catch (error) {
+        console.error("Ошибка при получении результатов студентов по тесту.", error);
+        return false; 
+    }
+}

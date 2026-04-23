@@ -1,11 +1,9 @@
 <template>
     <button class="btn" type="button" :disabled="clicked" @click="handleClick">
-        <template v-if="clicked">
+        <!-- <template v-if="clicked">
             ✓
-        </template>
-        <template v-else>
+        </template> -->
             <slot />
-        </template>
     </button>
 </template>
 
@@ -24,17 +22,17 @@ export default {
         }
     },
 
-    methods: {
-        handleClick(event) {
-            // this.$emit('click', event) // чтобы родитель тоже получил клик
+    // methods: {
+    //     handleClick(event) {
+    //         // this.$emit('click', event) // чтобы родитель тоже получил клик
 
-            this.clicked = true
+    //         this.clicked = true
 
-            setTimeout(() => {
-                this.clicked = false
-            }, 3000)
-        }
-    }
+    //         setTimeout(() => {
+    //             this.clicked = false
+    //         }, 3000)
+    //     }
+    // }
 };
 </script>
 
@@ -58,6 +56,6 @@ export default {
 }
 
 .btn:hover {
-    background: #1667ff;
+    background: #1668ff6c;
 }
 </style>

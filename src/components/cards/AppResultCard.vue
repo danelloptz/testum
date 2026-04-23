@@ -1,8 +1,5 @@
 <template>
   <div class="result">
-    <h1 class="result_title">
-      Результаты теста
-    </h1>
 
     <div class="result_card">
       <!-- Верх -->

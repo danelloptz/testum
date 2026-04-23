@@ -11,7 +11,7 @@
       :empty="empty"
       :blue="blue"
       :read="read"
-      @update="onUpdate"
+      @update:modelValue="onUpdate"
       @enterPress="$emit('enterPress')"
     />
   </div>

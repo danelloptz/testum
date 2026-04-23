@@ -16,7 +16,9 @@
                 placeholder="Введите пароль"
                 type="password"
                 class="input m20"
+                @enterPress="openHome"
             />
+            <span class="error">{{ error }}</span>
             <AppButton class="send" @click="openHome">Войти</AppButton>
         </div>
     </section>
@@ -33,14 +35,21 @@
         data() {
             return {
                 login: null, 
-                password: null
+                password: null,
+                error: null
             }
         },
         methods: {
             async openHome() {
-                const resp = await signIn();
+                console.log(this.login, this.password)
+                const resp = await signIn(this.login, this.password);
+                if (resp.detail) {
+                    this.error = resp.detail;
+                    return;
+                }
+                this.error = null;
                 if (resp) {
-                    const token = resp.token;
+                    const token = resp.access_token;
                     localStorage.setItem('token', token);
                 }
                 this.$router.push('/home');
@@ -100,5 +109,11 @@
         height: 52px;
         font-size: 16px;
         margin-top: 32px;
+    }
+
+    .error {
+        margin-top: 10px;
+        align-self: flex-start;
+        color: #B33333;
     }
 </style>

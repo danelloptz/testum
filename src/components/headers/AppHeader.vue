@@ -11,9 +11,9 @@
         :key="index"
         class="header_toogle_items"
         :class="{ active: index === activeIndex }"
-        @click="handler(index)"
+        @click="handler(item)"
       >
-        {{ item }}
+        {{ item.label }}
       </span>
     </div>
 
@@ -29,12 +29,13 @@ export default {
     userName: String
   },
   methods: {
-    handler(index) {
-        if (index == 0) 
-            this.$router.push('/home');
-        if (index == 1) 
-            this.$router.push('/results');
-        this.$emit('change', index);
+    handler(item) {
+        if (item.label == 'Выход') {
+            localStorage.clear();
+        }
+        if (item.route) {
+            this.$router.push(item.route)
+        }
     }
   }
 }

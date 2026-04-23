@@ -16,7 +16,7 @@
                     v-for="(item, index) in tests"
                     :key="index"
                     :test="item"
-                    @open="handleOpenCard(item)"
+                    @open="$router.push(`/results/${item.id}/${item.name}`)"
                 />
             </div>
         </main>
@@ -35,7 +35,11 @@
         components: { AppHeader, AppLectorTestCard },
         data() {
             return {
-                toogle_items: ['Тесты', 'Результаты', 'Выход'],
+                toogle_items: [
+                    { label: 'Тесты', route: '/home' },
+                    { label: 'Результаты', route: '/results' },
+                    { label: 'Выход', route: '/' }
+                ],
                 activeIndex: 1,
                 tests: null
             }

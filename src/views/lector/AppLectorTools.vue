@@ -9,16 +9,17 @@
 
         <main class="tests">
             <AppBreadcrumbs />
-            <h2>Ваши группы</h2>
+            <h2>Инструменты</h2>
             <div 
                 class="cards"
             >
-                <AppLectorGroupCard 
-                    v-for="(item, index) in groups"
+                <AppToolCard 
+                    v-for="(item, index) in tools"
                     :key="index"
-                    :name="item.name"
-                    :count="item.count"
-                    @open="$router.push(`/lector/${item.name}`)"
+                    :text="item.label"
+                    :icon="item.icon"
+                    :filled="item.filled"
+                    @open="handleOpen(item)"
                 />
             </div>
         </main>
@@ -27,25 +28,43 @@
 
 <script>
     import { useUserStore } from '@/stores/user'
-    import { getGroups } from '@/services/groups';
 
-    import AppLectorGroupCard from '@/components/cards/AppLectorGroupCard.vue';
+    import AppPencil from '@/assets/images/pencil.png';
+    import AppUpload from '@/assets/images/addImage.png';
+
     import AppHeader from '@/components/headers/AppHeader.vue';
     import AppBreadcrumbs from '@/components/navigation/AppBreadcrumbs.vue';
+    import AppToolCard from '@/components/cards/AppToolCard.vue';
 
     export default {
-        components: { AppLectorGroupCard, AppHeader, AppBreadcrumbs },
+        components: { AppHeader, AppBreadcrumbs, AppToolCard },
         data() {
             return {
                 userData: null,
                 token: 'mfkmrgk',
                 toogle_items: [
                     { label: 'Группы', route: '/lector' },
-                    { label: 'Инструменты', route: '/lector/tools' },
+                    { label: 'Инструменты', route: '/tools' },
                     { label: 'Выход', route: '/' }
                 ],
-                activeIndex: 0,
-                groups: null
+                activeIndex: 1,
+                tests: null,
+
+                AppPencil,
+                AppUpload,
+
+                tools: [
+                    {
+                        label: 'Создать тест',
+                        filled: true,
+                        icon: AppPencil
+                    },
+                    {
+                        label: 'Загрузить изображение',
+                        filled: false,
+                        icon: AppUpload
+                    }
+                ]
             }
         },
         async created() {
@@ -53,19 +72,17 @@
 
             await userStore.fetchUser()
             this.userData = userStore.user
-
-            const group_response = await getGroups(this.token)
-            if (group_response) {
-                this.groups = group_response
-            }
         },
-        // methods: {
-        //     handleOpenCard(card) {
-        //         if (card.status == 'Доступен') {
-        //             this.$router.push(`/test/${card.id}`)
-        //         }
-        //     }
-        // }
+        methods: {
+            handleOpen(tool) {
+                if (tool.label == 'Создать тест') {
+                    this.$router.push(`/lector/tools/create`)
+                }
+            },
+            openResults(test) {
+                this.$router.push(`/lector/${this.groupName}/${test.name}`)
+            }
+        }
     };
 </script>
 
@@ -93,7 +110,8 @@
     }
 
     .cards {
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
         gap: 24px;
         flex-wrap: wrap;
     }

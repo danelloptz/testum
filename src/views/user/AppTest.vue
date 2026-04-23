@@ -46,6 +46,7 @@
     import AppHeader from '@/components/headers/AppHeader.vue';
     import AppButton from '@/components/buttons/AppButton.vue';
     import AppResultCard from '@/components/cards/AppResultCard.vue';
+    
 
     import { useUserStore } from '@/stores/user'
     import { 
@@ -67,7 +68,11 @@
 
                 answers: {},
 
-                toogle_items: ['Тесты', 'Результаты', 'Выход'],
+                toogle_items: [
+                    { label: 'Тесты', route: '/home' },
+                    { label: 'Результаты', route: '/results' },
+                    { label: 'Выход', route: '/' }
+                ],
                 activeIndex: 0,
 
                 result: null

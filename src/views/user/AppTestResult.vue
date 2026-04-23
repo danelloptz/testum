@@ -8,7 +8,7 @@
         />
 
         <main class="tests">
-            <h2>Результаты пройденных тестов</h2>
+            <h2>Результат теста: {{ testName }}</h2>
             <AppResultCard 
                 :result="result"
                 @close="$router.push('/results')"
@@ -29,18 +29,28 @@
         components: { AppHeader, AppResultCard },
         data() {
             return {
-                toogle_items: ['Тесты', 'Результаты', 'Выход'],
+                toogle_items: [
+                    { label: 'Тесты', route: '/home' },
+                    { label: 'Результаты', route: '/results' },
+                    { label: 'Выход', route: '/' }
+                ],
                 activeIndex: 1,
                 result: null
             }
         },
         computed: {
+            testId() {
+                return this.$route.params.id
+            },
+            testName() {
+                return this.$route.params.name
+            },
             userData() {
                 return useUserStore().user
             }
         },
         async created() {
-            const result = await getTestResult(this.testId, token)
+            const result = await getTestResult(this.testId, localStorage.getItem('token'))
             this.result = result
         }
     };
