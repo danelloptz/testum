@@ -1,21 +1,37 @@
 import { defineStore } from 'pinia'
-import { getUserInfo } from '@/services/user'
+import { getMe } from '@/services/auth'
 
 export const useUserStore = defineStore('user', {
-  state: () => ({
-    user: null,
-    loaded: false
-  }),
+    state: () => ({
+        user: null
+    }),
 
-  actions: {
-    async fetchUser() {
-      if (this.loaded) return
+    actions: {
+        async fetchUser() {
+            const token = localStorage.getItem('access_token')
 
-      const data = await getUserInfo()
-      if (data) {
-        this.user = data
-        this.loaded = true
-      }
+            if (!token) {
+                this.user = null
+                return null
+            }
+
+            try {
+                const user = await getMe(token)
+
+                this.user = user
+
+                return user
+            } catch (e) {
+                this.user = null
+                return null
+            }
+        },
+
+        logout() {
+            this.user = null
+
+            localStorage.removeItem('access_token')
+            localStorage.removeItem('refresh_token')
+        }
     }
-  }
 })

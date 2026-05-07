@@ -31,6 +31,7 @@
 
     import AppPencil from '@/assets/images/pencil.png';
     import AppUpload from '@/assets/images/addImage.png';
+    import AppTool from '@/assets/images/tool.png';
 
     import AppHeader from '@/components/headers/AppHeader.vue';
     import AppBreadcrumbs from '@/components/navigation/AppBreadcrumbs.vue';
@@ -41,7 +42,6 @@
         data() {
             return {
                 userData: null,
-                token: 'mfkmrgk',
                 toogle_items: [
                     { label: 'Группы', route: '/lector' },
                     { label: 'Инструменты', route: '/lector/tools' },
@@ -52,6 +52,7 @@
 
                 AppPencil,
                 AppUpload,
+                AppTool,
 
                 tools: [
                     {
@@ -63,6 +64,11 @@
                         label: 'Загрузить изображение',
                         filled: false,
                         icon: AppUpload
+                    },
+                    {
+                        label: 'Добавить лектора',
+                        filled: false,
+                        icon: AppTool
                     }
                 ]
             }
@@ -78,6 +84,7 @@
                 if (tool.label == 'Создать тест') {
                     this.$router.push(`/lector/tools/create`)
                 }
+                
             },
             openResults(test) {
                 this.$router.push(`/lector/${this.groupName}/${test.name}`)

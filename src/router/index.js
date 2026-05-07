@@ -1,162 +1,230 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+
+import { useUserStore } from '@/stores/user'
+
+// AUTH
 import AppLogin from '@/views/auth/AppLogin.vue'
+
+// STUDENT
 import AppHome from '@/views/user/AppHome.vue'
 import AppTest from '@/views/user/AppTest.vue'
 import AppResults from '@/views/user/AppResults.vue'
 import AppTestResult from '@/views/user/AppTestResult.vue'
+
+// LECTURER
 import AppLectorTests from '@/views/lector/AppLectorTests.vue'
 import AppLectorGroupsTests from '@/views/lector/AppLectorGroupsTests.vue'
 import AppLectorTestResult from '@/views/lector/AppLectorTestResult.vue'
 import AppLectorCreateTest from '@/views/lector/AppLectorCreateTest.vue'
 import AppLectorTools from '@/views/lector/AppLectorTools.vue'
-
-import { getUserFromToken } from '@/utils/auth'
+import AppAdminAddLector from '@/views/admin/AppAdminAddLector.vue'
 
 const router = createRouter({
     history: createWebHashHistory(),
+
     routes: [
+        // AUTH
         {
             path: '/',
             name: 'signin',
             component: AppLogin,
-            meta: { public: true }
+            meta: {
+                public: true
+            }
         },
+
+        // LECTURER
         {
             path: '/lector',
             name: 'lector',
             component: AppLectorTests,
-            meta: { 
+            meta: {
                 roles: ['lector'],
                 breadcrumb: 'Группы'
             }
         },
+
         {
             path: '/lector/:group_name',
             name: 'group_tests',
             component: AppLectorGroupsTests,
-            meta: { 
+
+            meta: {
                 roles: ['lector'],
-                breadcrumb: (route) => route.params.group_name 
+                breadcrumb: (route) => route.params.group_name
             },
+
             beforeEnter: (to, from, next) => {
                 if (!to.params.group_name) {
                     next('/lector')
-                } else {
-                    next()
-                }   
+                    return
+                }
+
+                next()
             }
         },
+
         {
-            path: '/lector/:group_name/:test_name',
+            path: '/lector/:group_name/:test_id/:test_name',
             name: 'group_results',
             component: AppLectorTestResult,
-            meta: { 
+
+            meta: {
                 roles: ['lector'],
-                breadcrumb: 'Результаты' 
+                breadcrumb: 'Результаты'
             },
+
             beforeEnter: (to, from, next) => {
-                if (!to.params.test_name) {
-                    next('/lector/:group_name')
-                } else {
-                    next()
-                }   
+                if (!to.params.test_id || !to.params.test_name) {
+                    next('/lector')
+                    return
+                }
+
+                next()
             }
         },
+
         {
             path: '/lector/tools',
             name: 'lector_tools',
             component: AppLectorTools,
-            meta: { 
+
+            meta: {
                 roles: ['lector'],
                 breadcrumb: 'Инструменты'
             }
         },
+
         {
             path: '/lector/tools/create',
             name: 'lector_tools_create',
             component: AppLectorCreateTest,
-            meta: { 
+
+            meta: {
                 roles: ['lector'],
                 breadcrumb: 'Создать тест'
             }
         },
+
+        {
+            path: '/lector/tools/add_lector',
+            name: 'lector_tools_add_lector',
+            component: AppAdminAddLector,
+
+            meta: {
+                roles: ['admin'],
+                breadcrumb: 'Добавить лектора'
+            }
+        },
+
+        // STUDENT
         {
             path: '/home',
             name: 'home',
             component: AppHome,
-            meta: { roles: ['student'] }
+
+            meta: {
+                roles: ['student']
+            }
         },
+
         {
             path: '/results',
             name: 'results',
             component: AppResults,
-            meta: { roles: ['student'] }
+
+            meta: {
+                roles: ['student']
+            }
         },
+
         {
             path: '/test/:id',
             name: 'test',
             component: AppTest,
-            meta: { roles: ['student'] },
+
+            meta: {
+                roles: ['student']
+            },
+
             beforeEnter: (to, from, next) => {
                 if (!to.params.id) {
                     next('/home')
-                } else {
-                    next()
-                }   
+                    return
+                }
+
+                next()
             }
         },
+
         {
             path: '/results/:id/:name',
             name: 'result_test',
             component: AppTestResult,
-            meta: { roles: ['student'] },
+
+            meta: {
+                roles: ['student']
+            },
+
             beforeEnter: (to, from, next) => {
-                if (!to.params.name || !to.params.id) {
+                if (!to.params.id || !to.params.name) {
                     next('/results')
-                } else {
-                    next()
-                }   
+                    return
+                }
+
+                next()
             }
         }
-    ],
+    ]
 })
-router.beforeEach((to) => {
-    // localStorage.setItem('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwibmFtZSI6ItCh0YLRg9C00LXQvdGCIiwicm9sZSI6InN0dWRlbnQiLCJleHAiOjQ3MzM5ODQwMDB9.eT4g8V1n8zYw3Qy7yq6X9l0GxF4k5YhX9cQ3Yx2wQ1M')
-    const token = localStorage.getItem('token')
 
-    const user = token ? getUserFromToken() : null
+router.beforeEach(async (to) => {
+    const token = localStorage.getItem('access_token');
+    const userStore = useUserStore();
 
     // 1. нет токена
     if (!token) {
-        if (to.meta.public) return true
-        return { name: 'signin' }
+        if (to.meta.public) return true;
+        return { name: 'signin' };
     }
 
-    // 2. если уже залогинен и идёт на login
-    if (to.name === 'signin' && user?.role) {
-        if (user.role === 'lector') {
-            return { name: 'lector' }
-        }
-
-        if (user.role === 'student') {
-            return { name: 'home' }
-        }
+    // 2. загружаем пользователя
+    if (!userStore.user) {
+        await userStore.fetchUser();
     }
 
-    // 3. проверка ролей
-    if (to.meta.roles && !to.meta.roles.includes(user?.role)) {
-        if (user?.role === 'lector') {
-            return { name: 'lector' }
-        }
+    const user = userStore.user;
 
-        if (user?.role === 'student') {
-            return { name: 'home' }
-        }
-
-        return { name: 'signin' }
+    // 3. если пользователь не загрузился / токен битый
+    if (!user) {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        return { name: 'signin' };
     }
 
-    return true
-})
+    // 4. роль
+    const role =
+        user.login === 'lector'
+            ? 'admin'
+            : user.is_lecturer
+                ? 'lector'
+                : 'student';
+
+    // 5. редирект с login
+    if (to.name === 'signin') {
+        if (role === 'admin') return { name: 'lector_tools_add_lector' };
+        if (role === 'lector') return { name: 'lector' };
+        return { name: 'home' };
+    }
+
+    // 6. защита роутов
+    if (to.meta.roles && !to.meta.roles.includes(role)) {
+        if (role === 'admin') return { name: 'lector_tools_add_lector' };
+        if (role === 'lector') return { name: 'lector' };
+        return { name: 'home' };
+    }
+
+    return true;
+});
 
 export default router

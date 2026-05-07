@@ -28,7 +28,9 @@
     import AppInputLabel from '@/components/inputs/AppInputLabel.vue';
     import AppButton from '@/components/buttons/AppButton.vue';
     
-    import { login } from '@/services/auth';
+    import { login, getMe } from '@/services/auth';
+
+    import { useUserStore } from '@/stores/user'
 
     export default {
         components: { AppInputLabel, AppButton },
@@ -44,6 +46,7 @@
                 this.error = null;
 
                 try {
+                    // логин
                     const resp = await login(this.login, this.password);
 
                     if (!resp || !resp.access_token) {
@@ -51,11 +54,31 @@
                         return;
                     }
 
+                    // сохраняем токены
                     localStorage.setItem('access_token', resp.access_token);
                     localStorage.setItem('refresh_token', resp.refresh_token);
 
-                    this.$router.push('/home');
+                    // получаем пользователя
+                    const user = await getMe(resp.access_token);
+
+                    if (!user) {
+                        this.error = "Не удалось получить пользователя";
+                        return;
+                    }
+
+                    // сохраняем в store
+                    const userStore = useUserStore();
+                    userStore.user = user;
+
+                    // редирект
+                    if (user.is_lecturer) {
+                        this.$router.push('/lector');
+                    } else {
+                        this.$router.push('/home');
+                    }
+
                 } catch (e) {
+                    console.error(e);
                     this.error = "Неверный логин или пароль";
                 }
             }
