@@ -29,7 +29,7 @@
     import AppLectorTestCard from '@/components/cards/AppLectorTestCard.vue';
     
     import { useUserStore } from '@/stores/user'
-    import { getStudentFinishedTests } from '@/services/tests';
+    import { getFinishedStudentTests } from '@/services/tests';
 
     export default {
         components: { AppHeader, AppLectorTestCard },
@@ -50,8 +50,10 @@
             }
         },
         async created() {
-            const response = await getStudentFinishedTests();
-            this.tests = response;
+            const token = localStorage.getItem('access_token')
+
+            const resp = await getFinishedStudentTests(token)
+            this.tests = resp.finished_tests;
         }
     };
 </script>

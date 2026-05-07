@@ -60,7 +60,7 @@
       </div>
     </div>
 
-    <AppButton class="confirm" @click="$emit('close')">
+    <AppButton class="confirm_btn" @click="$emit('close')">
       Закрыть
     </AppButton>
   </div>
@@ -238,7 +238,7 @@ export default {
   color: #374151;
 }
 
-.confirm {
+.confirm_btn {
   width: 228px;
   height: 52px;
   border-radius: 8px;

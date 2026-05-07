@@ -9,60 +9,74 @@
 
         <main class="tests">
             <AppBreadcrumbs />
-            <h2>Результаты теста: {{ testName }}</h2>
-            <AppLectorTestResultTable :results="students" />
 
+            <h2>Результаты теста: {{ testName }}</h2>
+
+            <AppLectorTestResultTable
+                v-if="students"
+                :results="students"
+            />
         </main>
     </section>
-</template>    
+</template>
 
 <script>
     import { useUserStore } from '@/stores/user'
-    import { getStudentResults } from '@/services/tests';
+    import { getTestResults } from '@/services/tests'
 
     import AppHeader from '@/components/headers/AppHeader.vue';
     import AppLectorTestResultTable from '@/components/tables/AppLectorTestResultTable.vue';
     import AppBreadcrumbs from '@/components/navigation/AppBreadcrumbs.vue';
 
     export default {
-        components: { AppHeader, AppLectorTestResultTable, AppBreadcrumbs },
+        components: {
+            AppHeader,
+            AppLectorTestResultTable,
+            AppBreadcrumbs
+        },
+
         data() {
             return {
                 userData: null,
-                token: 'mfkmrgk',
+
                 toogle_items: [
                     { label: 'Группы', route: '/lector' },
-                    { label: 'Инструменты', route: '/tools' },
+                    { label: 'Инструменты', route: '/lector/tools' },
                     { label: 'Выход', route: '/' }
                 ],
+
                 activeIndex: 0,
-                students: null
+                students: []
             }
         },
+
         computed: {
+            testId() {
+                return this.$route.params.test_id
+            },
+
             testName() {
                 return this.$route.params.test_name
-            },
+            }
         },
+
         async created() {
             const userStore = useUserStore()
 
             await userStore.fetchUser()
             this.userData = userStore.user
 
-            const group_response = await getStudentResults(this.token)
-            if (group_response) {
-                this.students = group_response;
-                console.log(this.students);
+            const token = localStorage.getItem('access_token')
+
+            const group = this.$route.params.group
+            const year = new Date().getFullYear()
+
+            const resp = await getTestResults(token, this.testId, group, year)
+
+            if (resp && resp.results) {
+                this.students = resp.results
             }
-        },
-        // methods: {
-        //     handleOpenCard(card) {
-        //         if (card.status == 'Доступен') {
-        //             this.$router.push(`/test/${card.id}`)
-        //         }
-        //     }
-        // }
+        }
     };
 </script>
 
@@ -87,11 +101,5 @@
         font-size: 36px;
         font-weight: 700;
         color: black;
-    }
-
-    .cards {
-        display: flex;
-        gap: 24px;
-        flex-wrap: wrap;
     }
 </style>

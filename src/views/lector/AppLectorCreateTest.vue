@@ -6,11 +6,12 @@
             :userName="userData?.name"
             @change="activeIndex = $event"
         />
+
         <div class="create">
             <AppBreadcrumbs />
             <h2>Создать тест</h2>
 
-            <div 
+            <div
                 class="upload"
                 @dragover.prevent
                 @drop.prevent="handleDrop"
@@ -19,11 +20,7 @@
                     <img src="@/assets/images/test_create.png" class="test_create" />
 
                     <label class="file-btn">
-                        <input 
-                            type="file" 
-                            @change="handleFileChange"
-                            hidden
-                        />
+                        <input type="file" hidden @change="handleFileChange" />
                         Выберите файл
                         <span class="arrow">⌄</span>
                     </label>
@@ -32,19 +29,16 @@
                 </div>
             </div>
 
-            <!-- 👇 Информация о файле -->
             <div v-if="file" class="file-info">
                 <div class="file-text">
                     <strong>{{ file.name }}</strong>
                     <span>{{ formatSize(file.size) }}</span>
                 </div>
 
-                <button class="remove-btn" @click="removeFile">
-                    ✕
-                </button>
+                <button class="remove-btn" @click="removeFile">✕</button>
             </div>
 
-            <input 
+            <input
                 v-model="form.name"
                 class="input"
                 placeholder="Название теста"
@@ -53,32 +47,22 @@
             <div class="row">
                 <div class="field">
                     <label>Дата начала</label>
-                    <input 
-                        v-model="form.startDate"
-                        type="datetime-local"
-                        class="input"
-                    />
+                    <input v-model="form.startDate" type="datetime-local" class="input" />
                 </div>
 
                 <div class="field">
                     <label>Дата окончания</label>
-                    <input 
-                        v-model="form.endDate"
-                        type="datetime-local"
-                        class="input"
-                    />
+                    <input v-model="form.endDate" type="datetime-local" class="input" />
                 </div>
             </div>
 
-            <button 
-                class="create-btn"
-                @click="handleCreate"
-            >
+            <button class="create-btn" @click="handleCreate">
                 Создать тест
             </button>
+
+            <p v-if="error" class="error">{{ error }}</p>
         </div>
     </section>
-    
 </template>
 
 <script>
@@ -86,63 +70,81 @@
     import AppBreadcrumbs from '@/components/navigation/AppBreadcrumbs.vue';
 
     import { useUserStore } from '@/stores/user'
+    import { uploadTestFile } from '@/services/tests'
 
     export default {
         components: { AppHeader, AppBreadcrumbs },
+
         data() {
             return {
+                file: null,
+                error: null,
+
                 form: {
                     name: '',
-                    time: '',
-                    attempts: ''
+                    startDate: '',
+                    endDate: ''
                 },
-                file: null,
 
                 userData: null,
+
                 toogle_items: [
                     { label: 'Группы', route: '/lector' },
-                    { label: 'Инструменты', route: '/tools' },
+                    { label: 'Инструменты', route: '/lector/tools' },
                     { label: 'Выход', route: '/' }
                 ],
-                activeIndex: 1,
+
+                activeIndex: 1
             }
         },
+
         async created() {
             const userStore = useUserStore()
-
             await userStore.fetchUser()
             this.userData = userStore.user
         },
+
         methods: {
             handleFileChange(e) {
-                const selected = e.target.files[0]
-                if (selected) {
-                    this.file = selected
-                }
+                this.file = e.target.files[0] || null
             },
+
             handleDrop(e) {
-                const dropped = e.dataTransfer.files[0]
-                if (dropped) {
-                    this.file = dropped
-                }
+                this.file = e.dataTransfer.files[0] || null
             },
+
             removeFile() {
                 this.file = null
             },
+
             formatSize(size) {
                 const kb = size / 1024
                 if (kb < 1024) return kb.toFixed(1) + ' KB'
                 return (kb / 1024).toFixed(1) + ' MB'
             },
-            handleCreate() {
-                const payload = {
-                    ...this.form,
-                    file: this.file
+
+            async handleCreate() {
+                this.error = null
+
+                if (!this.file) {
+                    this.error = "Файл обязателен"
+                    return
                 }
 
-                console.log('Создание теста:', payload)
+                const token = localStorage.getItem('access_token')
 
-                this.$emit('create', payload)
+                const res = await uploadTestFile(
+                    token,
+                    this.file,
+                    false // ignore_validation
+                )
+
+                if (!res || !res.success) {
+                    this.error = "Ошибка при создании теста"
+                    return
+                }
+
+                this.$router.push('/lector')
             }
         }
     }
@@ -161,8 +163,6 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-    background: #f8fafc;
-    min-height: 100vh;
 }
 
 h2 {
@@ -170,7 +170,6 @@ h2 {
     font-weight: 700;
 }
 
-/* Upload */
 .upload {
     border: 2px dashed #3b82f6;
     border-radius: 12px;
@@ -189,10 +188,6 @@ h2 {
     align-items: center;
 }
 
-.icon {
-    font-size: 28px;
-}
-
 .test_create {
     width: 50px;
     height: 50px;
@@ -203,52 +198,22 @@ h2 {
     padding: 10px 16px;
     border-radius: 10px;
     cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 500;
 }
 
-.arrow {
-    font-size: 12px;
-}
-
-/* 👇 File info */
 .file-info {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    padding: 12px;
     background: #e5e7eb;
-    padding: 12px 16px;
     border-radius: 10px;
 }
 
-.file-text {
-    display: flex;
-    flex-direction: column;
-    font-size: 14px;
-}
-
-.file-text span {
-    color: #6b7280;
-    font-size: 13px;
-}
-
-.remove-btn {
-    border: none;
-    background: transparent;
-    font-size: 18px;
-    cursor: pointer;
-}
-
-/* Inputs */
 .input {
     width: 100%;
     padding: 16px;
     border-radius: 12px;
-    border: none;
     background: #e5e7eb;
-    font-size: 16px;
+    border: none;
 }
 
 .row {
@@ -256,34 +221,17 @@ h2 {
     gap: 20px;
 }
 
-/* Button */
 .create-btn {
-    margin-top: 10px;
     width: 200px;
-    align-self: center;
+    margin: 0 auto;
     padding: 14px;
     border-radius: 10px;
-    border: none;
     background: #2563eb;
     color: white;
     font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s;
 }
 
-.create-btn:hover {
-    background: #1d4ed8;
-}
-
-.field {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    width: 100%;
-}
-
-.field label {
-    font-size: 14px;
-    color: #6b7280;
+.error {
+    color: red;
 }
 </style>

@@ -27,8 +27,8 @@
 <script>
     import AppInputLabel from '@/components/inputs/AppInputLabel.vue';
     import AppButton from '@/components/buttons/AppButton.vue';
-
-    import { signIn } from '@/services/auth';
+    
+    import { login } from '@/services/auth';
 
     export default {
         components: { AppInputLabel, AppButton },
@@ -41,18 +41,23 @@
         },
         methods: {
             async openHome() {
-                console.log(this.login, this.password)
-                const resp = await signIn(this.login, this.password);
-                if (resp.detail) {
-                    this.error = resp.detail;
-                    return;
-                }
                 this.error = null;
-                if (resp) {
-                    const token = resp.access_token;
-                    localStorage.setItem('token', token);
+
+                try {
+                    const resp = await login(this.login, this.password);
+
+                    if (!resp || !resp.access_token) {
+                        this.error = "Ошибка авторизации";
+                        return;
+                    }
+
+                    localStorage.setItem('access_token', resp.access_token);
+                    localStorage.setItem('refresh_token', resp.refresh_token);
+
+                    this.$router.push('/home');
+                } catch (e) {
+                    this.error = "Неверный логин или пароль";
                 }
-                this.$router.push('/home');
             }
         }
     };

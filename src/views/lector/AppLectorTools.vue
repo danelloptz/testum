@@ -44,7 +44,7 @@
                 token: 'mfkmrgk',
                 toogle_items: [
                     { label: 'Группы', route: '/lector' },
-                    { label: 'Инструменты', route: '/tools' },
+                    { label: 'Инструменты', route: '/lector/tools' },
                     { label: 'Выход', route: '/' }
                 ],
                 activeIndex: 1,

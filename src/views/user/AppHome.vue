@@ -25,7 +25,7 @@
 
 <script>
     import { useUserStore } from '@/stores/user'
-    import { getStudentTests } from '@/services/tests';
+    import { getActiveStudentTests } from '@/services/tests';
 
     import AppTestCard from '@/components/cards/AppTestCard.vue';
     import AppHeader from '@/components/headers/AppHeader.vue';
@@ -35,7 +35,6 @@
         data() {
             return {
                 userData: null,
-                token: 'mfkmrgk',
                 toogle_items: [
                     { label: 'Тесты', route: '/home' },
                     { label: 'Результаты', route: '/results' },
@@ -51,9 +50,11 @@
             await userStore.fetchUser()
             this.userData = userStore.user
 
-            const tests_response = await getStudentTests(this.token)
+            const token = localStorage.getItem('access_token')
+
+            const tests_response = await getActiveStudentTests(token)
             if (tests_response) {
-                this.tests = tests_response
+                this.tests = tests_response.active_tests;
             }
         },
         methods: {

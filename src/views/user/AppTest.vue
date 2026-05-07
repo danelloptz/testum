@@ -2,21 +2,25 @@
     <div v-if="!testId" class="no_test">
         Пожалуйста, выберите тест для прохождения
     </div>
-    <section class="test" v-else>
+
+    <section class="test" ref="test_container" v-else>
         <AppHeader
             :items="toogle_items"
             :activeIndex="activeIndex"
             :userName="userData?.name"
             @change="activeIndex = $event"
         />
+
         <div class="instruction">
             <h2>Инструкция</h2>
-            <p>Lorem ipsum dolor sit amet consectetur adipiscing elit Ut et.Lorem ipsum dolor sit amet consectetur adipiscing elit Ut et.Lorem ipsum dolor sit amet consectetur adipiscing elit Ut et.Lorem ipsum dolor sit amet consectetur adipiscing elit Ut et.</p>
+            <p>Lorem ipsum dolor sit amet consectetur adipiscing elit...</p>
         </div>
-        <div class="instruction red" v-if="stage == 'extra'">
+
+        <div class="instruction red" v-if="stage === 'extra'">
             <h2>ОШИБКА</h2>
-            <p>Вы допустили ошибку при прохждении сложных вопросов. Пройдите дополнительные вопросы.</p>
+            <p>Вы допустили ошибку. Пройдите дополнительные вопросы.</p>
         </div>
+        
         <div class="questions" v-if="stage !== 'result'">
             <AppQuestionCard
                 v-for="(q, index) in questions"
@@ -31,131 +35,151 @@
                 @update:modelValue="val => handleAnswer(q.id, val)"
             />
         </div>
-        <AppResultCard 
+
+        <AppResultCard
             v-if="stage === 'result'"
             :result="result"
             @close="$router.push('/home')"
         />
-        <AppButton class="confirm" v-if="stage != 'result'"  @click="submitTest">Завершить и отправить</AppButton>
-        <AppButton class="confirm" v-if="stage === 'result'"  @click="$router.push('/home')">Закрыть</AppButton>
+
+        <AppButton
+            class="confirm"
+            v-if="stage !== 'result'"
+            @click="submitTest"
+        >
+            Завершить и отправить
+        </AppButton>
     </section>
-</template>    
+</template>
 
 <script>
     import AppQuestionCard from '@/components/cards/AppQuestionCard.vue';
     import AppHeader from '@/components/headers/AppHeader.vue';
     import AppButton from '@/components/buttons/AppButton.vue';
     import AppResultCard from '@/components/cards/AppResultCard.vue';
-    
 
-    import { useUserStore } from '@/stores/user'
-    import { 
-        getHardQu, 
-        getBaseQu, 
-        postHardQu, 
-        postBaseQu, 
-        getTestResult 
-    } from '@/services/tests'
+    import { nextTick } from 'vue';
+    import { useUserStore } from '@/stores/user';
+
+    import {
+        getBaseTasks,
+        getHardTasks,
+        submitBaseAnswers,
+        submitHardAnswers,
+        getStudentTestResult
+    } from '@/services/tests';
 
     export default {
         components: { AppQuestionCard, AppHeader, AppButton, AppResultCard },
+
         data() {
             return {
                 stage: 'normal', // normal | extra | result
 
                 questions: [],
-                extraQuestions: [],
-
                 answers: {},
+
+                result: null,
 
                 toogle_items: [
                     { label: 'Тесты', route: '/home' },
                     { label: 'Результаты', route: '/results' },
                     { label: 'Выход', route: '/' }
                 ],
-                activeIndex: 0,
 
-                result: null
-            }
+                activeIndex: 0
+            };
         },
+
         computed: {
             testId() {
-                return this.$route.params.id
+                return this.$route.params.id;
             },
+
             userData() {
-                return useUserStore().user
+                return useUserStore().user;
             }
         },
+
         async created() {
-            if (!this.testId) return
+            if (!this.testId) return;
 
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem('access_token');
 
-            const data = await getHardQu(this.testId, token)
+            const data = await getHardTasks(token, this.testId);
 
-            this.questions = this.normalizeQuestions(data)
+            this.questions = this.normalizeQuestions(data.tasks);
         },
 
         methods: {
-            normalizeQuestions(data) {
-                return data.map(q => ({
-                    id: q.id,
+            normalizeQuestions(tasks) {
+                return tasks.map(q => ({
+                    id: q.id ?? Math.random(), // если нет id
                     text: q.text,
                     image: q.image_url,
-                    answers: q.options.map(opt => opt.text),
-                    is_multiple_choice: q.is_multiple_choice
-                }))
+                    answers: q.answers.map(a => ({
+                        text: a.text,
+                        image: a.image_url
+                    })),
+                    is_multiple_choice: q.is_multiple_choice ?? false
+                }));
             },
-            formatDate(ts) {
-                return new Date(ts).toLocaleString()
-            },
+
             handleAnswer(questionId, value) {
-                this.answers[questionId] = value
+                this.answers[questionId] = value;
             },
 
             async submitTest() {
-                const token = localStorage.getItem('token')
+                const token = localStorage.getItem('access_token');
 
-                // преобразуем ответы
-                const task_answers = Object.entries(this.answers).map(([qId, value]) => ({
-                    question_id: Number(qId),
-                    answer_id: value
-                }));
+                const payload = {
+                    answers: Object.entries(this.answers).map(([task_id, options]) => ({
+                        task_id: Number(task_id),
+                        options: Array.isArray(options) ? options : [options]
+                    }))
+                };
 
-                console.log(task_answers);
-
+                // 🔹 1 этап — hard
                 if (this.stage === 'normal') {
-                    const res = await postHardQu(this.testId, task_answers, token)
+                    const res = await submitHardAnswers(token, this.testId, payload.answers);
 
-                    if (res.all_correct) {
-                        await this.finishTest()
-                        return
+                    if (res?.is_all_correct) {
+                        await this.finishTest();
+                        return;
                     }
 
-                    // 👉 есть ошибки → грузим base
-                    const base = await getBaseQu(this.testId, token)
+                    // 🔥 ошибка → грузим base
+                    const base = await getBaseTasks(token, this.testId);
 
-                    this.stage = 'extra'
-                    this.questions = this.normalizeQuestions(base)
-                    this.answers = {}
+                    this.stage = 'extra';
+                    this.questions = this.normalizeQuestions(base.tasks);
+                    this.answers = {};
 
-                    return
+                    await nextTick();
+
+                    this.$refs.test_container?.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+
+                    return;
                 }
 
+                // 🔹 2 этап — base
                 if (this.stage === 'extra') {
-                    await postBaseQu(this.testId, task_answers, token)
+                    await submitBaseAnswers(token, this.testId, payload.answers);
 
-                    await this.finishTest()
+                    await this.finishTest();
                 }
             },
 
             async finishTest() {
-                const token = localStorage.getItem('token')
+                const token = localStorage.getItem('access_token');
 
-                const result = await getTestResult(this.testId, token)
+                const result = await getStudentTestResult(token, this.testId);
 
-                this.result = result
-                this.stage = 'result'
+                this.result = result;
+                this.stage = 'result';
             }
         }
     };
@@ -210,8 +234,7 @@
     }
 
     .red {
-        background: #fee2e2; /* светло-красный */
+        background: #fee2e2;
         border: 1px solid #ef4444;
     }
-   
 </style>
