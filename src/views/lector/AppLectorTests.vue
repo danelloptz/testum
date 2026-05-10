@@ -9,15 +9,15 @@
 
         <main class="tests">
             <AppBreadcrumbs />
-            <h2>Ваши группы</h2>
+
+            <h2>Список тестов</h2>
 
             <div class="cards">
-                <AppLectorGroupCard
-                    v-for="(item, index) in groups"
+                <AppLectorGroupTestCard
+                    v-for="(item, index) in tests"
                     :key="index"
-                    :name="item.group_name"
-                    :count="item.members_count"
-                    @open="$router.push(`/lector/${item.group_name}`)"
+                    :test="item"
+                    @open="openResults(item)"
                 />
             </div>
         </main>
@@ -26,14 +26,18 @@
 
 <script>
     import { useUserStore } from '@/stores/user'
-    import { getTestGroups } from '@/services/groups'
+    import { getLecturerTests } from '@/services/tests'
 
-    import AppLectorGroupCard from '@/components/cards/AppLectorGroupCard.vue';
     import AppHeader from '@/components/headers/AppHeader.vue';
+    import AppLectorGroupTestCard from '@/components/cards/AppLectorGroupTestCard.vue';
     import AppBreadcrumbs from '@/components/navigation/AppBreadcrumbs.vue';
 
     export default {
-        components: { AppLectorGroupCard, AppHeader, AppBreadcrumbs },
+        components: {
+            AppLectorGroupTestCard,
+            AppHeader,
+            AppBreadcrumbs
+        },
 
         data() {
             return {
@@ -46,7 +50,7 @@
                 ],
 
                 activeIndex: 0,
-                groups: []
+                tests: []
             }
         },
 
@@ -58,14 +62,19 @@
 
             const token = localStorage.getItem('access_token')
 
-            // ⚠️ если нет test_id на этом экране — нужно передавать или выбрать дефолт
-            const testId = this.$route.params.test_id || 0
-            const year = new Date().getFullYear()
+            const resp = await getLecturerTests(token)
 
-            const resp = await getTestGroups(token, testId, year)
+            if (resp && resp.tests) {
+                // можно позже фильтровать по группе (если бек добавит group mapping)
+                this.tests = resp.tests
+            }
+        },
 
-            if (resp && resp.groups) {
-                this.groups = resp.groups
+        methods: {
+            openResults(test) {
+                this.$router.push(
+                    `/lector/${test.id}`
+                )
             }
         }
     };

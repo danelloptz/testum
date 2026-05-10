@@ -54,17 +54,17 @@
 
             const tests_response = await getActiveStudentTests(token)
             if (tests_response) {
-                this.tests = tests_response.active_tests;
+                this.tests = tests_response;
             }
         },
         methods: {
             handleOpenCard(card) {
-                if (card.status == 'Доступен') {
-                    this.$router.push(`/test/${card.id}`)
-                }
-                if (card.status == 'Не доступен') {
-                    this.$router.push(`/results/${card.id}/${card.name}`)
-                }
+                // if (card.status == 'Доступен') {
+                this.$router.push(`/test/${card.id}`)
+                // }
+                // if (card.status == 'Не доступен') {
+                //     this.$router.push(`/results/${card.id}/${card.name}`)
+                // }
             }
         }
     };

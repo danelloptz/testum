@@ -40,22 +40,22 @@ const router = createRouter({
             component: AppLectorTests,
             meta: {
                 roles: ['lector', 'admin'],
-                breadcrumb: 'Группы'
+                breadcrumb: 'Тесты'
             }
         },
 
         {
-            path: '/lector/:group_name',
+            path: '/lector/:test_id',
             name: 'group_tests',
             component: AppLectorGroupsTests,
 
             meta: {
                 roles: ['lector', 'admin'],
-                breadcrumb: (route) => route.params.group_name
+                breadcrumb: (route) => route.params.test_id
             },
 
             beforeEnter: (to, from, next) => {
-                if (!to.params.group_name) {
+                if (!to.params.test_id) {
                     next('/lector')
                     return
                 }
@@ -65,7 +65,7 @@ const router = createRouter({
         },
 
         {
-            path: '/lector/:group_name/:test_id/:test_name',
+            path: '/lector/:test_id/:group_name',
             name: 'group_results',
             component: AppLectorTestResult,
 
@@ -75,7 +75,7 @@ const router = createRouter({
             },
 
             beforeEnter: (to, from, next) => {
-                if (!to.params.test_id || !to.params.test_name) {
+                if (!to.params.test_id) {
                     next('/lector')
                     return
                 }

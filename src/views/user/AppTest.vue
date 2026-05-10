@@ -113,15 +113,19 @@
 
         methods: {
             normalizeQuestions(tasks) {
-                return tasks.map(q => ({
-                    id: q.id ?? Math.random(), // если нет id
+                return tasks.map((q, index) => ({
+                    id: index,
+
                     text: q.text,
-                    image: q.image_url,
+
+                    image: q.image_url || null,
+
                     answers: q.answers.map(a => ({
                         text: a.text,
-                        image: a.image_url
+                        image: a.image_url || null
                     })),
-                    is_multiple_choice: q.is_multiple_choice ?? false
+
+                    is_multiple_choice: q.answers.length > 1
                 }));
             },
 

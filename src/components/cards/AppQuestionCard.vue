@@ -32,7 +32,7 @@
                 @change="onSelect(index)"
                 :disabled="showResult"
             />
-            <span v-html="renderLatex(answer)"></span>
+            <span v-html="renderLatex(answer.text)"></span>
         </label>
     </div>
   </div>

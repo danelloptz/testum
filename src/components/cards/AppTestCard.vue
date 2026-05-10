@@ -1,32 +1,24 @@
 <template>
     <section class="card">
         <span 
-            class="status"
-            :class="{
-                green: test.status == 'Доступен',
-                yellow: test.status == 'В процессе',
-                red: test.status == 'Не доступен',
-            }">{{ test.status }}</span>
+            class="status green"
+        >Доступен</span>
 
             <h3>{{ test.name }}</h3>
             
             <span class="sm_mute">
-                {{ test.main_questions}} основных • {{ test.cnt_questions - test.main_questions }} дополнительных
+                {{ test.cnt_hard_questions}} основных • {{ test.cnt_questions - test.cnt_hard_questions }} дополнительных
             </span>
 
-            <span class="sm_mute m16 w_normal">
+            <!-- <span class="sm_mute m16 w_normal">
                 {{ formatDate(test.date_start) }} — {{ formatDate(test.date_end) }}
-            </span>
+            </span> -->
 
             <AppButton 
-                class="card_btn"
-                :class="{
-                    btn_in: test.status == 'В процессе',
-                    btn_close: test.status == 'Не доступен',
-                }"
+                class="card_btn btn_in"
                 @click="$emit('open')"
             >
-                {{ test.status == 'Доступен' ? 'Начать' : test.status == 'В процессе' ? 'Продолжить' : 'Результаты' }}
+                Начать
             </AppButton>
     </section>
 </template>

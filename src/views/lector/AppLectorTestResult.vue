@@ -10,7 +10,7 @@
         <main class="tests">
             <AppBreadcrumbs />
 
-            <h2>Результаты теста: {{ testName }}</h2>
+            <h2>Результаты теста: {{ testId }}</h2>
 
             <AppLectorTestResultTable
                 v-if="students"
@@ -54,10 +54,6 @@
             testId() {
                 return this.$route.params.test_id
             },
-
-            testName() {
-                return this.$route.params.test_name
-            }
         },
 
         async created() {

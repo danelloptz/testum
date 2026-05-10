@@ -585,7 +585,7 @@ export async function uploadTestFile(token, file, ignoreValidation = false) {
         formData.append('ignore_validation', ignoreValidation);
 
         const response = await axios.post(
-            `${API_BASE_URL}/lecturer/tests/upload`,
+            `${API_BASE_URL}/lecturer/tests`,
             formData,
             {
                 headers: {

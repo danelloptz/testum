@@ -32,11 +32,11 @@ const crumbs = computed(() => {
 
   // 👇 Лекторская зона
   if (route.name === 'lector') {
-    c.push({ label: 'Группы', path: '/lector' })
+    c.push({ label: 'Тесты', path: '/lector' })
   }
 
   if (route.name === 'group_tests') {
-    c.push({ label: 'Группы', path: '/lector' })
+    c.push({ label: 'Тесты', path: '/lector' })
     c.push({
       label: route.params.group_name,
       path: `/lector/${route.params.group_name}`
@@ -44,7 +44,7 @@ const crumbs = computed(() => {
   }
 
   if (route.name === 'group_results') {
-    c.push({ label: 'Группы', path: '/lector' })
+    c.push({ label: 'Тесты', path: '/lector' })
     c.push({
       label: route.params.group_name,
       path: `/lector/${route.params.group_name}`
