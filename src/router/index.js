@@ -39,7 +39,7 @@ const router = createRouter({
             name: 'lector',
             component: AppLectorTests,
             meta: {
-                roles: ['lector'],
+                roles: ['lector', 'admin'],
                 breadcrumb: 'Группы'
             }
         },
@@ -50,7 +50,7 @@ const router = createRouter({
             component: AppLectorGroupsTests,
 
             meta: {
-                roles: ['lector'],
+                roles: ['lector', 'admin'],
                 breadcrumb: (route) => route.params.group_name
             },
 
@@ -70,7 +70,7 @@ const router = createRouter({
             component: AppLectorTestResult,
 
             meta: {
-                roles: ['lector'],
+                roles: ['lector', 'admin'],
                 breadcrumb: 'Результаты'
             },
 
@@ -90,7 +90,7 @@ const router = createRouter({
             component: AppLectorTools,
 
             meta: {
-                roles: ['lector'],
+                roles: ['lector', 'admin'],
                 breadcrumb: 'Инструменты'
             }
         },
@@ -101,7 +101,7 @@ const router = createRouter({
             component: AppLectorCreateTest,
 
             meta: {
-                roles: ['lector'],
+                roles: ['lector', 'admin'],
                 breadcrumb: 'Создать тест'
             }
         },
