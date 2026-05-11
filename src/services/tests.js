@@ -564,16 +564,47 @@ export async function downloadTestFile(token, testId) {
         const response = await axios.get(
             `${API_BASE_URL}/lecturer/tests/${testId}/file`,
             {
+                responseType: 'blob',
                 headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                responseType: 'blob'
+                    Authorization: `Bearer ${token}`
+                }
             }
         );
 
-        return response.data; // Blob
-    } catch (error) {
-        console.error("Ошибка при скачивании файла теста.", error);
+        // имя файла
+        let fileName = `test_${testId}.md`;
+
+        const disposition = response.headers['content-disposition'];
+
+        if (disposition) {
+            const match = disposition.match(/filename="?(.+)"?/);
+
+            if (match?.[1]) {
+                fileName = match[1];
+            }
+        }
+
+        // blob -> download
+        const url = window.URL.createObjectURL(
+            new Blob([response.data])
+        );
+
+        const link = document.createElement('a');
+
+        link.href = url;
+        link.setAttribute('download', fileName);
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        link.remove();
+
+        window.URL.revokeObjectURL(url);
+
+        return true;
+    } catch (e) {
+        console.error('Ошибка скачивания файла', e);
         return false;
     }
 }

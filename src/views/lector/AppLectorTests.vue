@@ -1,4 +1,11 @@
 <template>
+    <AppConfirmModal
+        v-if="isModal"
+        title="Удаление теста"
+        text="Вы действительно хотите удалить тест?"
+        @confirm="handleDelete"
+        @cancel="isModal = false, delete_item = null"
+    />
     <section class="main">
         <AppHeader
             :items="toogle_items"
@@ -18,6 +25,8 @@
                     :key="index"
                     :test="item"
                     @open="openResults(item)"
+                    @delete="askDelete(item)"
+                    @download="download(item)"
                 />
             </div>
         </main>
@@ -26,17 +35,19 @@
 
 <script>
     import { useUserStore } from '@/stores/user'
-    import { getLecturerTests } from '@/services/tests'
+    import { getLecturerTests, deleteTest, downloadTestFile } from '@/services/tests'
 
     import AppHeader from '@/components/headers/AppHeader.vue';
     import AppLectorGroupTestCard from '@/components/cards/AppLectorGroupTestCard.vue';
     import AppBreadcrumbs from '@/components/navigation/AppBreadcrumbs.vue';
+    import AppConfirmModal from '@/components/modals/AppConfirmModal.vue';
 
     export default {
         components: {
             AppLectorGroupTestCard,
             AppHeader,
-            AppBreadcrumbs
+            AppBreadcrumbs,
+            AppConfirmModal
         },
 
         data() {
@@ -50,7 +61,9 @@
                 ],
 
                 activeIndex: 0,
-                tests: []
+                tests: [],
+                isModal: false,
+                delete_item: null
             }
         },
 
@@ -71,10 +84,37 @@
         },
 
         methods: {
+            async download(test) {
+                await downloadTestFile(localStorage.getItem('access_token'), test.id)
+            },
             openResults(test) {
                 this.$router.push(
-                    `/lector/${test.id}`
+                    `/lector/${test.id}/${test.name}`
                 )
+            },
+            askDelete(item) {
+                this.delete_item = item;
+                this.isModal = true;
+            },
+            async handleDelete() {
+                this.isModal = false;
+                try {
+                    const token = localStorage.getItem('access_token')
+
+                    const resp = await deleteTest(
+                        token,
+                        this.delete_item.id
+                    )
+
+                    if (resp) {
+                        this.tests = this.tests.filter(
+                            t => t.id !== this.delete_item.id
+                        )
+                        this.delete_item = null;
+                    }
+                } catch (e) {
+                    console.error(e)
+                }
             }
         }
     };

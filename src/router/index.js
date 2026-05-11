@@ -45,7 +45,7 @@ const router = createRouter({
         },
 
         {
-            path: '/lector/:test_id',
+            path: '/lector/:test_id/:test_name',
             name: 'group_tests',
             component: AppLectorGroupsTests,
 
@@ -65,7 +65,7 @@ const router = createRouter({
         },
 
         {
-            path: '/lector/:test_id/:group_name',
+            path: '/lector/:test_id/:test_name/:group_name',
             name: 'group_results',
             component: AppLectorTestResult,
 

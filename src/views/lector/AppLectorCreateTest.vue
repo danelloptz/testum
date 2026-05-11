@@ -1,4 +1,10 @@
 <template>
+    <AppMainModal
+        v-if="isModal"
+        :title="title"
+        :text="msg"
+        @close="isModal = false"
+    />
     <section class="create_wrapper">
         <AppHeader
             :items="toogle_items"
@@ -13,7 +19,10 @@
 
             <div
                 class="upload"
-                @dragover.prevent
+                :class="{ dragging: isDragging }"
+                @dragover.prevent="isDragging = true"
+                @dragenter.prevent="isDragging = true"
+                @dragleave.prevent="isDragging = false"
                 @drop.prevent="handleDrop"
             >
                 <div class="upload-inner">
@@ -22,7 +31,6 @@
                     <label class="file-btn">
                         <input type="file" hidden @change="handleFileChange" />
                         Выберите файл
-                        <span class="arrow">⌄</span>
                     </label>
 
                     <p>или перетащите файл сюда</p>
@@ -37,25 +45,6 @@
 
                 <button class="remove-btn" @click="removeFile">✕</button>
             </div>
-
-            <input
-                v-model="form.name"
-                class="input"
-                placeholder="Название теста"
-            />
-
-            <div class="row">
-                <div class="field">
-                    <label>Дата начала</label>
-                    <input v-model="form.startDate" type="datetime-local" class="input" />
-                </div>
-
-                <div class="field">
-                    <label>Дата окончания</label>
-                    <input v-model="form.endDate" type="datetime-local" class="input" />
-                </div>
-            </div>
-
             <button class="create-btn" @click="handleCreate">
                 Создать тест
             </button>
@@ -68,12 +57,13 @@
 <script>
     import AppHeader from '@/components/headers/AppHeader.vue';
     import AppBreadcrumbs from '@/components/navigation/AppBreadcrumbs.vue';
+    import AppMainModal from '@/components/modals/AppMainModal.vue';
 
     import { useUserStore } from '@/stores/user'
     import { uploadTestFile } from '@/services/tests'
 
     export default {
-        components: { AppHeader, AppBreadcrumbs },
+        components: { AppHeader, AppBreadcrumbs, AppMainModal },
 
         data() {
             return {
@@ -94,7 +84,12 @@
                     { label: 'Выход', route: '/' }
                 ],
 
-                activeIndex: 1
+                activeIndex: 1,
+
+                title: null,
+                msg: null,
+                isModal: false,
+                isDragging: false
             }
         },
 
@@ -110,6 +105,7 @@
             },
 
             handleDrop(e) {
+                this.isDragging = false
                 this.file = e.dataTransfer.files[0] || null
             },
 
@@ -127,7 +123,9 @@
                 this.error = null
 
                 if (!this.file) {
-                    this.error = "Файл обязателен"
+                    this.title = 'Ошибка!';
+                    this.msg = 'Нужно выбрать файл.';
+                    this.isModal = true;
                     return
                 }
 
@@ -140,8 +138,20 @@
                 )
 
                 if (!res || !res.success) {
-                    this.error = "Ошибка при создании теста"
-                    return
+                    this.title = 'Ошибка загрузки теста';
+
+                    const errors = [
+                        ...(res?.format_errors || []).map(e => e.error),
+                        ...(res?.validation_errors || []).map(e => e.error)
+                    ];
+
+                    this.msg = errors.length
+                        ? errors.join('\n')
+                        : 'Не удалось загрузить тест';
+
+                    this.isModal = true;
+
+                    return;
                 }
 
                 this.$router.push('/lector')
@@ -168,16 +178,6 @@
 h2 {
     font-size: 36px;
     font-weight: 700;
-}
-
-.upload {
-    border: 2px dashed #3b82f6;
-    border-radius: 12px;
-    height: 180px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f1f5f9;
 }
 
 .upload-inner {
@@ -208,6 +208,12 @@ h2 {
     border-radius: 10px;
 }
 
+.file-text {
+    display: flex;
+    column-gap: 10px;
+    align-items: center;
+}
+
 .input {
     width: 100%;
     padding: 16px;
@@ -229,9 +235,27 @@ h2 {
     background: #2563eb;
     color: white;
     font-weight: 600;
+    border: none;
 }
 
 .error {
     color: red;
+}
+
+.upload {
+    border: 2px dashed #3b82f6;
+    border-radius: 12px;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    transition: 0.2s;
+}
+
+.upload.dragging {
+    background: #dbeafe;
+    border-color: #2563eb;
+    transform: scale(1.01);
 }
 </style>

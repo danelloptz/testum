@@ -53,7 +53,7 @@
             const token = localStorage.getItem('access_token')
 
             const resp = await getFinishedStudentTests(token)
-            this.tests = resp.finished_tests;
+            this.tests = resp;
         }
     };
 </script>

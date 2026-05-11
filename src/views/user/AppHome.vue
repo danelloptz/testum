@@ -12,6 +12,7 @@
             <div 
                 class="cards"
             >
+                <span class="no_tests" v-if="!tests || tests.length == 0">Нет доступных тестов</span>
                 <AppTestCard 
                     v-for="(item, index) in tests"
                     :key="index"
@@ -97,5 +98,11 @@
         display: flex;
         gap: 24px;
         flex-wrap: wrap;
+    }
+
+    .no_tests {
+        font-size: 20px;
+        color: black;
+        opacity: .5;
     }
 </style>

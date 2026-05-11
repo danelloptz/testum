@@ -22,14 +22,14 @@
             :key="index"
             class="answer"
             :class="[
-                { selected: isSelected(index) },
+                { selected: isSelected(answer.id) },
                 getAnswerClass(index)
             ]"
             >
             <input
                 :type="is_multiple_choice ? 'checkbox' : 'radio'"
-                :checked="isSelected(index)"
-                @change="onSelect(index)"
+                :checked="isSelected(answer.id)"
+                @change="onSelect(answer)"
                 :disabled="showResult"
             />
             <span v-html="renderLatex(answer.text)"></span>
@@ -121,21 +121,27 @@ export default {
         return '';
     },
 
-    onSelect(index) {
-        if (this.is_multiple_choice) {
-            let updated = Array.isArray(this.selected) ? [...this.selected] : [];
+    onSelect(answer) {
+        const answerId = answer.id;
 
-            if (updated.includes(index)) {
-                updated = updated.filter(i => i !== index);
+        if (this.is_multiple_choice) {
+            let updated = Array.isArray(this.selected)
+                ? [...this.selected]
+                : [];
+
+            if (updated.includes(answerId)) {
+                updated = updated.filter(i => i !== answerId);
             } else {
-                updated.push(index);
+                updated.push(answerId);
             }
 
             this.selected = updated;
+
             this.$emit("update:modelValue", updated);
         } else {
-            this.selected = index;
-            this.$emit("update:modelValue", index);
+            this.selected = answerId;
+
+            this.$emit("update:modelValue", answerId);
         }
     },
 

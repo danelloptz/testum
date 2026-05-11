@@ -1,5 +1,5 @@
 <template>
-    <button class="btn" type="button" :disabled="clicked" @click="handleClick">
+    <button class="btn_btn" type="button" :disabled="clicked" @click="handleClick">
         <!-- <template v-if="clicked">
             ✓
         </template> -->
@@ -37,7 +37,7 @@ export default {
 </script>
 
 <style scoped>
-.btn {
+.btn_btn {
     width: 100%;
     height: 60px;
     border-radius: 16px;
@@ -55,7 +55,7 @@ export default {
     justify-content: center;
 }
 
-.btn:hover {
+.btn_btn:hover {
     background: #1668ff6c;
 }
 </style>

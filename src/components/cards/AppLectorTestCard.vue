@@ -3,7 +3,7 @@
             <h3>{{ test.name }}</h3>
             
             <span class="sm_mute">
-                {{ test.main_questions}} основных • {{ test.cnt_questions - test.main_questions }} дополнительных
+                {{ test.cnt_hard_questionsт}} основных • {{ test.cnt_questions - test.cnt_hard_questions }} дополнительных
             </span>
 
             <span class="sm_mute m16 w_normal">

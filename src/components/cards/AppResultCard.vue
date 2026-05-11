@@ -15,7 +15,7 @@
         </div>
 
         <div class="percent">
-          {{ result.success_rate }} правильных ответов
+          {{ result.success_rate }}% правильных ответов
         </div>
       </div>
 
@@ -43,7 +43,7 @@
         <div class="icon green">✔</div>
         <div class="info_text">
           <b>Правильных ответов:</b>
-          {{ correctCount }} из {{ totalCount }} ({{ result.success_rate }})
+          {{ result.success_rate }}%
         </div>
       </div>
 
@@ -51,11 +51,11 @@
         <div class="progress_bar">
           <div 
             class="progress_fill"
-            :style="{ width: result.success_rate }"
+            :style="{ width: `${result.success_rate}%` }"
           ></div>
         </div>
         <div class="progress_percent">
-          {{ result.success_rate }}
+          {{ result.success_rate }}%
         </div>
       </div>
     </div>

@@ -38,7 +38,7 @@
                     :name="item.group_name"
                     :count="item.members_count"
                     @open="$router.push(
-                        `/lector/${testId}/${item.group_name}`
+                        `/lector/${testId}/${testName}/${item.group_name}`
                     )"
                 />
             </div>
@@ -90,6 +90,9 @@ export default {
     computed: {
         testId() {
             return this.$route.params.test_id;
+        },
+        testName() {
+            return this.$route.params.test_name;
         }
     },
 

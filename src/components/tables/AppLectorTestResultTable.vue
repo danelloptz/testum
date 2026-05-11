@@ -2,7 +2,9 @@
   <div class="wrapper">
     <!-- Статистика -->
     <div class="stats">
-      Студентов: {{ total }} | Сдало: {{ passed }} | Ср. балл: {{ avg }}
+      Студентов: {{ total }} |
+      Сдало: {{ passed }} |
+      Ср. балл: {{ avg }}
     </div>
 
     <!-- Таблица -->
@@ -14,18 +16,24 @@
       </div>
 
       <div
-        v-for="(student, index) in results"
-        :key="index"
+        v-for="student in results"
+        :key="student.student_id"
         class="row"
       >
-        <div class="col name">{{ student.name }}</div>
-        <div class="col percent">{{ student.result.percent }}</div>
+        <div class="col name">
+          {{ student.name }}
+        </div>
+
+        <div class="col percent">
+          {{ student.score }}%
+        </div>
+
         <div class="col grade">
           <span
             class="grade-badge"
-            :class="getGradeClass(student.result.mark)"
+            :class="getGradeClass(student.mark)"
           >
-            {{ student.result.mark }}
+            {{ student.mark }}
           </span>
         </div>
       </div>
@@ -44,117 +52,113 @@ export default {
 
   computed: {
     total() {
-      return this.results?.length;
+      return this.results.length;
     },
+
     passed() {
-      return this.results?.filter(r => Number(r.result.mark) >= Number(r.result.success_rate)).length;
+      return this.results.filter(
+        r => Number(r.mark) >= 3
+      ).length;
     },
+
     avg() {
-      if (!this.results?.length) return 0;
+      if (!this.results.length) return 0;
+
       return (
-        this.results.reduce((s, r) => s + +r.result.mark, 0) /
-        this.results.length
+        this.results.reduce(
+          (sum, r) => sum + Number(r.mark),
+          0
+        ) / this.results.length
       ).toFixed(1);
     },
   },
 
   methods: {
     getGradeClass(grade) {
-      if (grade === '5') return "g5";
-      if (grade === '4') return "g4";
-      if (grade === '3') return "g3";
-      return "g2";
+      const g = Number(grade);
+
+      if (g === 5) return 'g5';
+      if (g === 4) return 'g4';
+      if (g === 3) return 'g3';
+
+      return 'g2';
     },
   },
 };
 </script>
 
 <style scoped>
+    .wrapper {
+        width: 100%;
+    }
 
-/* Статистика */
-.stats {
-  background: #e7edf5;
-  border-radius: 12px;
-  padding: 14px;
-  text-align: center;
-  font-size: 15px;
-  color: #374151;
-  margin-bottom: 20px;
-box-shadow: 0px 4px 20px 0px #0000000D;
-}
+    .stats {
+        margin-bottom: 20px;
+        font-size: 18px;
+        font-weight: 600;
+    }
 
-/* Таблица */
-.table {
-  background: white;
-  border-radius: 14px;
-  overflow: hidden;
-    box-shadow: 0px 4px 20px 0px #0000000D;
-}
+    .table {
+        width: 100%;
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+    }
 
-/* Header */
-.thead {
-  display: flex;
-  padding: 16px 20px;
-  background: #F1F5F9;
-  color: #6b7280;
-  font-weight: 600;
-}
+    .thead,
+    .row {
+        display: flex;
+        align-items: center;
+    }
 
-/* Row */
-.row {
-  display: flex;
-  padding: 18px 20px;
-  border-top: 1px solid #eef2f7;
-  align-items: center;
-}
+    .thead {
+        background: #f1f5f9;
+        font-weight: 700;
+    }
 
-/* Колонки */
-.col {
-  flex: 1;
-}
+    .row {
+        border-top: 1px solid #e2e8f0;
+    }
 
-.name {
-  flex: 1;
-  text-align: center;
-}
+    .col {
+        padding: 20px;
+    }
 
-.percent {
-  flex: 1;
-  text-align: center;
-}
+    .name {
+        flex: 2;
+    }
 
-.grade {
-  flex: 1;
-    text-align: center;
-}
+    .percent {
+        flex: 1;
+    }
 
-/* Оценка */
-.grade-badge {
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 14px;
-  color: white;
-}
+    .grade {
+        width: 140px;
+    }
 
-/* Цвета как на скрине */
-.g5 {
-  background: #86efac;
-  color: #166534;
-}
+    .grade-badge {
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-weight: 700;
+    }
 
-.g4 {
-  background: #bbf7d0;
-  color: #166534;
-}
+    .g5 {
+        background: #dcfce7;
+        color: #166534;
+    }
 
-.g3 {
-  background: #fed7aa;
-  color: #9a3412;
-}
+    .g4 {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
 
-.g2 {
-  background: #fecaca;
-  color: #991b1b;
-}
+    .g3 {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .g2 {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
 </style>

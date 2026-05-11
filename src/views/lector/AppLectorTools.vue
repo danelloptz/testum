@@ -84,7 +84,9 @@
                 if (tool.label == 'Создать тест') {
                     this.$router.push(`/lector/tools/create`)
                 }
-                
+                if (tool.label == 'Добавить лектора') {
+                    this.$router.push(`/lector/tools/add_lector`)
+                }
             },
             openResults(test) {
                 this.$router.push(`/lector/${this.groupName}/${test.name}`)
@@ -121,5 +123,6 @@
         grid-template-columns: 1fr 1fr 1fr;
         gap: 24px;
         flex-wrap: wrap;
+        padding-right: 121px;
     }
 </style>

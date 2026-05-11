@@ -10,7 +10,7 @@
         <main class="tests">
             <AppBreadcrumbs />
 
-            <h2>Результаты теста: {{ testId }}</h2>
+            <h2>Результаты теста: {{ testName }}</h2>
 
             <AppLectorTestResultTable
                 v-if="students"
@@ -54,6 +54,9 @@
             testId() {
                 return this.$route.params.test_id
             },
+            testName() {
+                return this.$route.params.test_name
+            },
         },
 
         async created() {
@@ -64,10 +67,10 @@
 
             const token = localStorage.getItem('access_token')
 
-            const group = this.$route.params.group
+            const group = this.$route.params.group_name
             const year = new Date().getFullYear()
 
-            const resp = await getTestResults(token, this.testId, group, year)
+            const resp = await getTestResults(token, this.testId, group, 0)
 
             if (resp && resp.results) {
                 this.students = resp.results

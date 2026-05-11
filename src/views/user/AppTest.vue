@@ -114,7 +114,7 @@
         methods: {
             normalizeQuestions(tasks) {
                 return tasks.map((q, index) => ({
-                    id: index,
+                    id: q.id,
 
                     text: q.text,
 
@@ -122,7 +122,8 @@
 
                     answers: q.answers.map(a => ({
                         text: a.text,
-                        image: a.image_url || null
+                        image: a.image_url || null,
+                        id: a.id
                     })),
 
                     is_multiple_choice: q.answers.length > 1
