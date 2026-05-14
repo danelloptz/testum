@@ -126,7 +126,7 @@
                         id: a.id
                     })),
 
-                    is_multiple_choice: q.answers.length > 1
+                    is_multiple_choice: q.is_multiple_choice
                 }));
             },
 

@@ -45,6 +45,50 @@
 
                 <button class="remove-btn" @click="removeFile">✕</button>
             </div>
+            <div class="images_block">
+                <h3>Загрузка изображений</h3>
+
+                <label class="image-upload-btn">
+                    <input
+                        type="file"
+                        accept="image/*"
+                        hidden
+                        @change="handleImageUpload"
+                    />
+                    Загрузить изображение
+                </label>
+
+                <div
+                    v-if="uploadedImages.length"
+                    class="images_list"
+                >
+                    <div
+                        v-for="(img, index) in uploadedImages"
+                        :key="index"
+                        class="image_item"
+                    >
+                        <img
+                            :src="img.preview"
+                            class="preview"
+                        />
+
+                        <div class="image_info">
+                            <input
+                                :value="img.url"
+                                readonly
+                                class="link_input"
+                            />
+
+                            <button
+                                class="copy_btn"
+                                @click="copyLink(img.url)"
+                            >
+                                Копировать
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <button class="create-btn" @click="handleCreate">
                 Создать тест
             </button>
@@ -60,7 +104,7 @@
     import AppMainModal from '@/components/modals/AppMainModal.vue';
 
     import { useUserStore } from '@/stores/user'
-    import { uploadTestFile } from '@/services/tests'
+    import { uploadTestFile, uploadPicture } from '@/services/tests'
 
     export default {
         components: { AppHeader, AppBreadcrumbs, AppMainModal },
@@ -89,7 +133,9 @@
                 title: null,
                 msg: null,
                 isModal: false,
-                isDragging: false
+                isDragging: false,
+
+                uploadedImages: []
             }
         },
 
@@ -100,6 +146,36 @@
         },
 
         methods: {
+            async handleImageUpload(e) {
+                const files = Array.from(e.target.files || []);
+
+                if (!files.length) return;
+
+                const token = localStorage.getItem('access_token');
+
+                for (const file of files) {
+                    const res = await uploadPicture(token, file);
+
+                    if (res?.Success) {
+                        this.uploadedImages.push({
+                            name: file.name,
+                            url: res.URL,
+                            preview: URL.createObjectURL(file)
+                        });
+                    }
+                }
+
+                // чтобы можно было загрузить тот же файл повторно
+                e.target.value = '';
+            },
+
+            async copyLink(link) {
+                await navigator.clipboard.writeText(link)
+
+                this.title = 'Ссылка скопирована'
+                this.msg = link
+                this.isModal = true
+            },
             handleFileChange(e) {
                 this.file = e.target.files[0] || null
             },
@@ -257,5 +333,81 @@ h2 {
     background: #dbeafe;
     border-color: #2563eb;
     transform: scale(1.01);
+}
+
+.images_block {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.images_block h3 {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.image-upload-btn {
+    width: fit-content;
+    background: #dbeafe;
+    color: #2563eb;
+    padding: 12px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.image-upload-btn:hover {
+    opacity: 0.9;
+}
+
+.images_list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.image_item {
+    background: white;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 4px 25px 0 #0000000d;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.preview {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+.image_info {
+    width: 100%;
+    display: flex;
+    gap: 12px;
+}
+
+.link_input {
+    flex: 1;
+    border: none;
+    background: #f1f5f9;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 14px;
+}
+
+.copy_btn {
+    border: none;
+    background: #2563eb;
+    color: white;
+    border-radius: 10px;
+    padding: 0 18px;
+    cursor: pointer;
+    font-weight: 600;
 }
 </style>

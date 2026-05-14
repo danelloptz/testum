@@ -61,11 +61,6 @@
                         icon: AppPencil
                     },
                     {
-                        label: 'Загрузить изображение',
-                        filled: false,
-                        icon: AppUpload
-                    },
-                    {
                         label: 'Добавить лектора',
                         filled: false,
                         icon: AppTool

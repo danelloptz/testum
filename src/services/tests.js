@@ -805,3 +805,27 @@ export async function submitHardAnswers(token, testId, answers) {
         return false;
     }
 }
+
+export async function uploadPicture(token, file) {
+    try {
+        const formData = new FormData();
+
+        formData.append('file', file);
+
+        const response = await axios.post(
+            `${API_BASE_URL}/lecturer/picture`,
+            formData,
+            {
+                headers: {
+                    ...authHeader(token),
+                    'Content-Type': 'multipart/form-data'
+                }
+            }
+        );
+
+        return response.data; // { url, success }
+    } catch (error) {
+        console.error('Ошибка при загрузке картинки.', error);
+        return false;
+    }
+}

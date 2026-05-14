@@ -16,7 +16,7 @@
       </div>
 
       <div
-        v-for="student in results"
+        v-for="student in filteredResults"
         :key="student.student_id"
         class="row"
       >
@@ -50,28 +50,34 @@ export default {
     },
   },
 
-  computed: {
-    total() {
-      return this.results.length;
-    },
+    computed: {
+        filteredResults() {
+            return this.results.filter(
+                r => r.score !== undefined && r.mark !== undefined
+            );
+        },
 
-    passed() {
-      return this.results.filter(
-        r => Number(r.mark) >= 3
-      ).length;
-    },
+        total() {
+            return this.filteredResults.length;
+        },
 
-    avg() {
-      if (!this.results.length) return 0;
+        passed() {
+            return this.filteredResults.filter(
+                r => Number(r.mark) >= 3
+            ).length;
+        },
 
-      return (
-        this.results.reduce(
-          (sum, r) => sum + Number(r.mark),
-          0
-        ) / this.results.length
-      ).toFixed(1);
+        avg() {
+            if (!this.filteredResults.length) return 0;
+
+            return (
+                this.filteredResults.reduce(
+                    (sum, r) => sum + Number(r.mark),
+                    0
+                ) / this.filteredResults.length
+            ).toFixed(1);
+        },
     },
-  },
 
   methods: {
     getGradeClass(grade) {
